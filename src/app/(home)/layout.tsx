@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { Quicksand } from 'next/font/google';
-import './globals.css';
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { Header } from '@/components/Header';
+import cns from 'classnames';
+import '../globals.css';
 
 const quicksand = Quicksand({subsets: ['vietnamese'] });
 
@@ -19,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang='vietnamese'>
-      <body className={quicksand.className}>
+      <body className={cns('static', quicksand.className)}>
         <Header />
 
         <ToastContainer
@@ -33,7 +34,9 @@ export default function RootLayout({
           pauseOnHover
           theme='light'
         />
-        {children}
+        <div className='absolute top-20 w-full h-[calc(100vh-80px)] z-[-1]'>
+          {children}
+        </div>
       </body>
     </html>
   );

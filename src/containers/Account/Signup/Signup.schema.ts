@@ -1,10 +1,43 @@
 import { z } from 'zod';
 
+const phoneRegex = new RegExp(
+  /^(032|033|034|035|036|037|038|039|096|097|098|086|083|084|085|081|082|088|091|094|070|079|077|076|078|090|093|089|056|058|092|059|099)[0-9]{7}$/
+);
+
 export const SignupSchema = z
   .object({
-    email: z
+    email: z.string().email('Vui lòng nhập đúng định dạng email!'),
+    phoneNumber: z
       .string()
-      .email('Vui lòng nhập đúng định dạng email!'),
+      .superRefine((val, ctx) => {
+        if (val.length < 10) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_small,
+            minimum: 10,
+            message: 'SĐT phải chứa 10 số!',
+            inclusive: true,
+            type: 'string',
+            fatal: true,
+          });
+        }
+        if (val.length > 10) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_big,
+            maximum: 10,
+            message: 'SĐT phải chứa 10 số!',
+            inclusive: true,
+            type: 'string',
+            fatal: true,
+          });
+        }
+
+        if (!phoneRegex.test(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Sai định dạng số điện thoại!',
+          });
+        }
+      }),
     username: z
       .string()
       .min(4, { message: 'Tên đăng nhập phải có ít nhất 4 ký tự!' })
@@ -20,7 +53,9 @@ export const SignupSchema = z
   })
   .refine((data) => data.password === data.confirm, {
     message: 'Mật khẩu không trùng khớp với nhau!',
-    path: ['confirm']
+    path: ['confirm'],
   });
+
+// SignupSchema.parse({phoneNumber: '0396714802'})
 
 export type SignupForm = z.infer<typeof SignupSchema>;

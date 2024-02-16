@@ -28,7 +28,13 @@ const Signup = (props: Props) => {
   const form = useForm<SignupForm>({
     resolver: zodResolver(SignupSchema),
     mode: 'onSubmit',
-    defaultValues: { email: '', username: '', password: '', confirm: '' },
+    defaultValues: {
+      email: '',
+      phoneNumber: '',
+      username: '',
+      password: '',
+      confirm: '',
+    },
   });
 
   const onSignupSubmit = ({
@@ -49,7 +55,7 @@ const Signup = (props: Props) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSignupSubmit)}
-        className={cns('space-y-6 m-auto w-[400px]', className)}
+        className={cns('space-y-2 m-auto w-[400px]', className)}
       >
         <p className='font-extrabold text-center text-3xl text-green-500'>
           ĐĂNG KÝ
@@ -63,6 +69,20 @@ const Signup = (props: Props) => {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input placeholder='Nhập email...' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='phoneNumber'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Số điện thoại</FormLabel>
+              <FormControl>
+                <Input placeholder='Nhập số điện thoại...' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
