@@ -8,11 +8,11 @@ const ItemBar = (props: Props) => {
 
   return (
     <Link
-      onClick={() => onClick(false)}
+      onClick={onClick}
       href={url}
-      className={cns('cursor-pointer hover:text-gray-300 transition-colors duration-200 p-3', className)}
-      onMouseOver={() => onMouseOver(true)}
-      onMouseLeave={() => onMouseLeave(false)}
+      className={cns('cursor-pointer hover:text-gray-400 transition-colors duration-200 p-3', className)}
+      onMouseOver={onMouseOver}
+      onMouseLeave={onMouseLeave}
     >
       {text}
     </Link>

@@ -20,7 +20,7 @@ export default function AuthLayout({
 }) {
   return (
     <html lang='vietnamese'>
-      <body className={quicksand.className}>
+      <body className={quicksand.className} suppressHydrationWarning={true}>
         <Image
           src='/images/animated-img-1.jpg'
           alt='Signin Image'

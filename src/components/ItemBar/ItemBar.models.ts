@@ -1,9 +1,11 @@
+import { MouseEventHandler } from "react";
+
 export interface Props {
   className?: string;
   url: string;
   text: string;
   //
-  onClick: (value: boolean) => void;
-  onMouseOver: (value: boolean) => void;
-  onMouseLeave: (value: boolean) => void;
+  onClick: MouseEventHandler<HTMLAnchorElement>;
+  onMouseOver: MouseEventHandler<HTMLAnchorElement>;
+  onMouseLeave: MouseEventHandler<HTMLAnchorElement>;
 }

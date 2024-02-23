@@ -1,0 +1,1 @@
+export type HeaderType = 'CATEGORIES' | 'BESTSELLING' | 'TRANSACTIONHISTORY' | 'ACCOUNT';
