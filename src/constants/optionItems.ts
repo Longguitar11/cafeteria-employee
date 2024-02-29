@@ -1,6 +1,6 @@
 import { HeaderType } from "@/types/header";
 
-export const sideBarItems: { key: HeaderType, url: string, text: string }[] = [
+export const optionItems: { key: HeaderType, url: string, text: string }[] = [
     {
         key: 'BESTSELLING',
         url: '/best-selling',

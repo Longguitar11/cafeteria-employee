@@ -1,29 +1,76 @@
-export const foodAndDrinks: {
-  id: string;
-  idCate: string;
-  name: string;
-  price: string;
-  thumbnail: string;
-}[] = [
+import { DishInterface } from '@/types/dish';
+
+export const foodAndDrinks: DishInterface[] = [
   {
-    id: '0',
+    idDish: '0',
     idCate: '0',
     name: 'Cà phê đen',
+    quantity: 100,
     price: '12000',
     thumbnail: '/images/milk-coffee.webp',
   },
   {
-    id: '1',
+    idDish: '1',
     idCate: '0',
     name: 'Cà phê sữa',
+    quantity: 100,
     price: '15000',
     thumbnail: '/images/milk-coffee.webp',
   },
   {
-    id: '2',
+    idDish: '2',
     idCate: '0',
     name: 'Bạc xỉu',
+    quantity: 100,
     price: '18000',
+    thumbnail: '/images/milk-coffee.webp',
+  },
+  {
+    idDish: '3',
+    idCate: '1',
+    name: 'Cam ép',
+    quantity: 100,
+    price: '15000',
+    thumbnail: '/images/milk-coffee.webp',
+  },
+  {
+    idDish: '4',
+    idCate: '4',
+    name: 'Hamberger thịt bò nướng',
+    quantity: 100,
+    price: '20000',
+    thumbnail: '/images/milk-coffee.webp',
+  },
+  {
+    idDish: '5',
+    idCate: '4',
+    name: 'Hamberger thịt bò nướng lá lốt',
+    quantity: 100,
+    price: '25000',
+    thumbnail: '/images/milk-coffee.webp',
+  },
+  {
+    idDish: '6',
+    idCate: '3',
+    name: 'Bánh mì bò lá lốt',
+    quantity: 100,
+    price: '25000',
+    thumbnail: '/images/milk-coffee.webp',
+  },
+  {
+    idDish: '7',
+    idCate: '3',
+    name: 'Bánh mì ốp la',
+    quantity: 100,
+    price: '15000',
+    thumbnail: '/images/milk-coffee.webp',
+  },
+  {
+    idDish: '8',
+    idCate: '3',
+    name: 'Bánh mì thập cẩm',
+    quantity: 100,
+    price: '25000',
     thumbnail: '/images/milk-coffee.webp',
   },
 ];

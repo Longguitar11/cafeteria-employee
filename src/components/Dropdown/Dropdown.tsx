@@ -10,7 +10,7 @@ const Dropdown = (props: DropdownType) => {
       {data.map((item, index) => {
         const quantity = calculateProductQuantity(item.id)
           ? `(${calculateProductQuantity(item.id)})`
-          : '';
+          : '(0)';
         return (
           <div
             key={index}
@@ -23,7 +23,7 @@ const Dropdown = (props: DropdownType) => {
               index === 0 && 'rounded-tl rounded-tr'
             )}
           >
-            {item.name} <span className='text-red-500'>{quantity}</span>
+            {item.label} <span className='text-red-500'>{quantity}</span>
           </div>
         );
       })}

@@ -8,36 +8,26 @@ import { CardCustom } from '@/components/CardCustom';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { getValueString } from '@/utils/currency';
-import { Size } from '@/components/Size';
-import { SizeType } from '@/types/size';
 import { Quantity } from '@/components/Quantity';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { createOrder, updateOrder } from '@/redux/orderSlice';
-import { calString } from '@/utils/dish';
 
 export default function IdCategory({ params }: { params: { idCate: string } }) {
   // state
   const [open, setOpen] = useState<boolean>(false);
   const [cardId, setCardId] = useState<string>('');
-  const [selectedSize, setSelectedSize] = useState<{
-    size: SizeType;
-    price: string;
-  }>({ size: 'S', price: '0' });
   const [quantity, setQuantity] = useState<number>(1);
 
   // selectors
-  const allOrders = useAppSelector((state) => state.orderStore.allOrders);
   const order = useAppSelector((state) => state.orderStore.order);
+  const allOrders = useAppSelector((state) => state.orderStore.allOrders);
 
   const dispatch = useAppDispatch();
 
   const category = categories.find((cate) => cate.id == params.idCate);
   const products = foodAndDrinks.filter((item) => item.idCate == params.idCate);
-  const selectedCard = products.find((prod) => prod.id === cardId);
-  const total = (
-    (parseInt(selectedCard?.price || '0') + parseInt(selectedSize?.price)) *
-    quantity
-  ).toString();
+  const selectedCard = products.find((prod) => prod.idDish === cardId);
+  const total = (parseInt(selectedCard?.price || '0') * quantity).toString();
   const amount = getValueString(total);
 
   const onCardClick = (id: string) => {
@@ -46,41 +36,33 @@ export default function IdCategory({ params }: { params: { idCate: string } }) {
   };
 
   const onAddToOrderSummit = () => {
-    const product = products.find((product) => product.id === cardId);
+    const product = products.find((product) => product.idDish === cardId);
 
     if (product) {
-      const { id, name, price, thumbnail } = product;
+      const { idDish, idCate, name, price, thumbnail } = product;
 
       if (order.dishes.length === 0) {
         dispatch(
           createOrder({
-            idDish: id,
+            idDish,
+            idCate,
             name,
             thumbnail,
-            details: [
-              {
-                size: selectedSize.size,
-                price: calString([price, selectedSize.price], '+'),
-                quantity,
-              },
-            ],
-            total: total,
+            quantity,
+            price,
+            total,
           })
         );
       } else {
         dispatch(
           updateOrder({
-            idDish: id,
+            idDish,
+            idCate,
             name,
             thumbnail,
-            details: [
-              {
-                size: selectedSize.size,
-                price: calString([price, selectedSize.price], '+'),
-                quantity,
-              },
-            ],
-            total: total,
+            quantity,
+            price,
+            total,
           })
         );
       }
@@ -91,23 +73,23 @@ export default function IdCategory({ params }: { params: { idCate: string } }) {
 
   useEffect(() => {
     setQuantity(1);
-    setSelectedSize({ size: 'S', price: '0' });
+    // setSelectedSize({ size: 'S', price: '0' });
   }, [open]);
 
   return (
     <section className='py-10 px-10'>
       <p className='text-gray-700 text-3xl font-medium uppercase border-b-[0.5px] border-gray-400'>
-        {category?.name}
+        {category?.label}
       </p>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-10'>
         {products.length > 0 ? (
           products.map((prod) => {
-            const { id, thumbnail, name, price } = prod;
+            const { idDish, thumbnail, name, price } = prod;
             return (
               <CardCustom
-                key={id}
-                onClick={() => onCardClick(id)}
+                key={idDish}
+                onClick={() => onCardClick(idDish)}
                 thumbnail={thumbnail}
                 name={name}
                 price={price}
@@ -135,22 +117,24 @@ export default function IdCategory({ params }: { params: { idCate: string } }) {
                 {getValueString(selectedCard?.price || '0')}
               </p>
 
-              <Size value={selectedSize.size} onClick={setSelectedSize} />
+              {/* <Size value={selectedSize.size} onClick={setSelectedSize} /> */}
               <Quantity quantity={quantity} setQuantity={setQuantity} />
+            </div>
 
-              <p className='text-xl'>
+            <div className='space-y-3'>
+              <p className='text-xl text-end'>
                 Thành tiền:{' '}
                 <span className='font-medium text-red-500'>{amount}</span>
               </p>
+              <Button
+                type='submit'
+                variant='success'
+                className='w-full'
+                onClick={onAddToOrderSummit}
+              >
+                Thêm vào đơn hàng
+              </Button>
             </div>
-
-            <Button
-              type='submit'
-              variant='success'
-              onClick={onAddToOrderSummit}
-            >
-              Thêm vào đơn hàng
-            </Button>
           </div>
         </DialogContent>
       </Dialog>

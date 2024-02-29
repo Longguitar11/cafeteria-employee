@@ -2,7 +2,8 @@ import { MouseEventHandler } from 'react';
 
 export type DropdownData = {
   id: string;
-  name: string;
+  value?: string
+  label: string;
 };
 
 export type DropdownType = {

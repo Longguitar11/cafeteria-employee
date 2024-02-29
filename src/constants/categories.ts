@@ -1,27 +1,31 @@
-import { DropdownData } from "@/types/dropdown";
+import { DropdownData } from '@/types/dropdown';
+import { escapeText } from '@/utils/text';
 
-export const categories: DropdownData[] = [
+export let categories: DropdownData[] = [
   {
     id: '0',
-    name: 'Cà phê',
+    label: 'Cà phê',
   },
   {
-    id: '1', name: 'Nước ép',
+    id: '1',
+    label: 'Nước ép',
   },
   {
     id: '2',
-    name: 'Nước giải khát',
+    label: 'Nước giải khát',
   },
   {
     id: '3',
-    name: 'Bánh mì',
+    label: 'Bánh mì',
   },
   {
     id: '4',
-    name: 'Hamberger',
+    label: 'Hamberger',
   },
   {
     id: '5',
-    name: 'Bánh bao',
+    label: 'Bánh bao',
   },
 ];
+
+categories.map((cate) => cate.value = escapeText(cate.label).toLocaleLowerCase())
