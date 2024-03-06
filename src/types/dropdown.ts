@@ -4,6 +4,7 @@ export type DropdownData = {
   id: string;
   value?: string
   label: string;
+  url?: string
 };
 
 export type DropdownType = {

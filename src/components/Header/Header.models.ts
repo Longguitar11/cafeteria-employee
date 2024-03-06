@@ -11,6 +11,7 @@ export type Hovered = { header?: boolean; option?: boolean };
 export type DropdownHoverType = {
   categories?: Hovered;
   bestSelling?: Hovered;
+  account?: Hovered;
 };
 
 export type OrderModalType = {
@@ -38,13 +39,6 @@ export type OptionsType = {
   setIsOpen: (value: boolean) => void;
   setIsHover: (value: DropdownHoverType) => void;
   onCategoryClick: (id: string) => void;
-};
-
-export type AlertDialogCustomType = {
-  className?: string;
-  buttonTitle: string;
-  //
-  onSubmit: () => void;
 };
 
 export type EditDishType = {

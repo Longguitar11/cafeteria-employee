@@ -1,4 +1,4 @@
-import { Signin } from '@/containers/Account/Signin'
+import { Signin } from '@/containers/Account'
 import React from 'react'
 
 const SiginPage = () => {

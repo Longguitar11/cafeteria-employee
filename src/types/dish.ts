@@ -10,8 +10,9 @@ export interface DishInterface {
   idDish: string;
   idCate: string;
   name: string;
-  thumbnail: string;
+  thumbnail: any;
   quantity: number;
   price: string;
+  category?: string;
   total?: string;
 }

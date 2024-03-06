@@ -1,6 +1,5 @@
 import Axios from "../configAxios";
 import { getDishesByCate, getAllDishes as getAll } from "../dishSlice";
-import { updateDishes } from "../orderSlice";
 
 export const getDishes = async (dispatch, idCate) => {
   const res = await Axios.get("/api/dish", { params: { category: idCate } });

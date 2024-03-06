@@ -6,9 +6,9 @@ import {
   FormMessage,
 } from '../ui/form';
 import { Input } from '../ui/input';
-import { Props } from './InputField.models';
+import { Props } from './InputCustom.models';
 
-const InputField = (props: Props) => {
+const InputCustom = (props: Props) => {
   const { control, label, name, placeholder } = props;
   
   return (
@@ -28,4 +28,4 @@ const InputField = (props: Props) => {
   );
 };
 
-export default InputField;
+export default InputCustom;

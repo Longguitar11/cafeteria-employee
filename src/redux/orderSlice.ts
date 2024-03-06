@@ -1,6 +1,6 @@
 'use client';
-import { foodAndDrinks } from '@/constants/foodAndDrinks';
-import { DishDetailsType, DishInterface } from '@/types/dish';
+
+import { DishInterface } from '@/types/dish';
 import { OrderInterface } from '@/types/order';
 import { addString, calAmount } from '@/utils/dish';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
@@ -38,7 +38,6 @@ const OrderSlice = createSlice({
         idCate,
         quantity = 1,
         total = '0',
-        // details
       } = action.payload;
 
       let sameDish = state.order.dishes.find(
@@ -85,12 +84,17 @@ const OrderSlice = createSlice({
     },
     addDishes: (state, action: PayloadAction<string[]>) => {
       const dishIds = action.payload;
+
+      const allDishes = JSON.parse(
+        localStorage.getItem('allDishes') || '[]'
+      ) as DishInterface[];
       const orderedDishIds = state.order.dishes.map(
         ({ idDish }: DishInterface) => idDish
       );
 
       for (let id of dishIds) {
-        const currentDish = foodAndDrinks.find((dish) => dish.idDish === id);
+        const currentDish =
+          allDishes.length > 0 && allDishes.find((dish) => dish.idDish === id);
 
         if (orderedDishIds.includes(id) && currentDish) {
           const sameDish = state.order.dishes.find(

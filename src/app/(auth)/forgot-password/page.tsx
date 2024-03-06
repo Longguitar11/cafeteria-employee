@@ -1,4 +1,4 @@
-import { ForgotPassword } from '@/containers/Account/ForgotPassword'
+import { ForgotPassword } from '@/containers/Account'
 import React from 'react'
 
 const ForgotPasswordPage = () => {

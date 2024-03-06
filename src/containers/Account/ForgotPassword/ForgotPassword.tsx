@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import cns from 'classnames';
 import { useForm } from 'react-hook-form';
 import {
   ForgotPasswordForm,
@@ -9,7 +8,6 @@ import {
 } from './ForgotPassword.schema';
 import { Props } from './ForgotPassword.models';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
 import {
   Form,
   FormControl,
@@ -21,8 +19,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { account } from '../../../constants/account';
 import { useRouter } from 'next/navigation';
+import { forgotPassword } from '@/apis/user';
+import { cn } from '@/lib/utils';
 
 const ForgotPassword = (props: Props) => {
   const { className = '' } = props;
@@ -33,30 +32,45 @@ const ForgotPassword = (props: Props) => {
     defaultValues: { email: '' },
   });
 
+  const {
+    handleSubmit,
+    control,
+    formState: { isValid },
+  } = form;
+
   const router = useRouter();
 
   const onForgotPasswordSubmit = ({ email }: ForgotPasswordForm) => {
-    console.log({ email });
-    if (email === account.email) router.push('/change-password');
+    if (isValid) {
+      const res = forgotPassword({ email });
+
+      res
+        .then((res) => {
+          if (res) router.replace('/signin');
+        })
+        .catch((error) => {
+          console.log({ error });
+        });
+    }
   };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onForgotPasswordSubmit)}
-        className={cns('space-y-6 m-auto w-[400px]', className)}
+        onSubmit={handleSubmit(onForgotPasswordSubmit)}
+        className={cn('space-y-6 m-auto w-[400px]', className)}
       >
         <p className='font-extrabold text-center text-3xl text-green-500'>
           QUÊN MẬT KHẨU
         </p>
 
         <FormField
-          control={form.control}
+          control={control}
           name='email'
           render={({ field }) => (
             <FormItem>
               <div className='flex justify-between'>
-                  <FormLabel>Email</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormLabel>
                   <Link
                     href='/signin'

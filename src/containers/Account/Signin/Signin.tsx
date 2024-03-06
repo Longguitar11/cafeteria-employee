@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import cns from 'classnames';
 import { useForm } from 'react-hook-form';
 import { SigninForm, SigninSchema } from './Signin.schema';
 import { Props } from './Signin.models';
@@ -17,9 +16,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { account } from '../../../constants/account';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
+import { signin } from '@/apis/user';
+import { cn } from '@/lib/utils';
 
 const Signin = (props: Props) => {
   const { className = '' } = props;
@@ -27,38 +26,50 @@ const Signin = (props: Props) => {
   const form = useForm<SigninForm>({
     resolver: zodResolver(SigninSchema),
     mode: 'onSubmit',
-    defaultValues: { username: '', password: '' },
+    defaultValues: { email: '', password: '' },
   });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid },
+  } = form;
 
   const router = useRouter();
 
-  const onSigninSubmit = ({ username, password }: SigninForm) => {
-    console.log({ username, password });
-    if (username === account.username && password === account.password) {
-      toast.success('Đăng nhập thành công!')
-      router.push('/');
+  const onSigninSubmit = ({ email, password }: SigninForm) => {
+    if (isValid) {
+      console.log({ email, password });
+      const res = signin({ email, password });
+
+      res
+        .then((res) => {
+          if (res) router.replace('/');
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-    else toast.error('Sai tên đăng nhập hoặc mật khẩu!')
   };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSigninSubmit)}
-        className={cns('space-y-6 m-auto w-[400px]', className)}
+        onSubmit={handleSubmit(onSigninSubmit)}
+        className={cn('space-y-6 m-auto w-[400px]', className)}
       >
         <p className='font-extrabold text-center text-3xl text-green-500'>
           ĐĂNG NHẬP
         </p>
 
         <FormField
-          control={form.control}
-          name='username'
+          control={control}
+          name='email'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tên đăng nhập</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder='Nhập tên đăng nhập...' {...field} />
+                <Input placeholder='Nhập email...' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,7 +77,7 @@ const Signin = (props: Props) => {
         />
 
         <FormField
-          control={form.control}
+          control={control}
           name='password'
           render={({ field }) => (
             <FormItem>

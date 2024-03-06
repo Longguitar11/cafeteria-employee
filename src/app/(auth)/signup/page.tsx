@@ -1,4 +1,4 @@
-import { Signup } from '@/containers/Account/Signup'
+import { Signup } from '@/containers/Account'
 import React from 'react'
 
 const SignupPage = () => {

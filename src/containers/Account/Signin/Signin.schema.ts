@@ -1,10 +1,7 @@
 import { z } from 'zod';
 
 export const SigninSchema = z.object({
-  username: z
-    .string()
-    .min(4, { message: 'Tên đăng nhập phải có ít nhất 4 ký tự!' })
-    .max(15, 'Độ dài tên đăng nhập tối đa là 15!'),
+  email: z.string().email('Vui lòng nhập đúng định dạng email!'),
   password: z
     .string()
     .min(8, { message: 'Mật khẩu phải có ít nhất 8 ký tự!' })

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { optionItems } from '@/constants/optionItems';
@@ -15,10 +15,15 @@ import { OrderIcon } from '../OrderIcon';
 import { cancelOrder, confirmOrder, deleteDish } from '@/redux/orderSlice';
 import { cn } from '@/lib/utils';
 import { Options, OrderModal } from './Header.views';
+import { accountDropdown } from '@/constants/accountDropdown';
+import { useAuthContext } from '@/containers/Auth/Auth.context';
+import { jwtDecode } from 'jwt-decode';
 
 const Header = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+
+  const { token, removeToken } = useAuthContext();
 
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isOrderOpen, setIsOrderOpen] = useState<boolean>(false);
@@ -56,6 +61,31 @@ const Header = () => {
     setIsOrderOpen(false);
   };
 
+  const onDishesManagementClick = () => {
+    router.push('/dishes-management');
+  };
+
+  const onAccountClick = (url: string) => {
+    if (url === '/signin') {
+      removeToken();
+      router.push(url);
+    } else router.push(url);
+  };
+
+  useEffect(() => {
+    if (token) {
+      const decodedJwt = jwtDecode(token);
+
+      if (decodedJwt.exp! * 1000 < Date.now()) {
+        console.log(decodedJwt.exp! * 1000, Date.now());
+        // logout
+        removeToken();
+        router.push('/signin');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
   return (
     <section
       className={cn(
@@ -76,54 +106,66 @@ const Header = () => {
         </Link>
 
         <div className='relative hidden sm:block'>
-          <div className='space-x-6'>
-            <Button
-              variant='ghost'
-              onMouseOver={() =>
-                setIsHovered({ bestSelling: { header: true } })
-              }
-              onMouseLeave={() =>
-                setIsHovered({ bestSelling: { header: false } })
-              }
-            >
-              Bán chạy
-            </Button>
+          <div className='flex gap-6'>
+            <div className='relative'>
+              <Button
+                variant='ghost'
+                onMouseOver={() =>
+                  setIsHovered({ bestSelling: { header: true } })
+                }
+                onMouseLeave={() =>
+                  setIsHovered({ bestSelling: { header: false } })
+                }
+              >
+                Bán chạy
+              </Button>
+              {isHovered.bestSelling?.header && (
+                <Dropdown
+                  data={bestSelling}
+                  onClick={() =>
+                    setIsHovered({ bestSelling: { header: false } })
+                  }
+                  onMouseOver={() =>
+                    setIsHovered({ bestSelling: { header: true } })
+                  }
+                  onMouseLeave={() =>
+                    setIsHovered({ bestSelling: { header: false } })
+                  }
+                />
+              )}
+            </div>
 
-            <Button
-              variant='ghost'
-              onMouseOver={() => setIsHovered({ categories: { header: true } })}
-              onMouseLeave={() =>
-                setIsHovered({ categories: { header: false } })
-              }
-            >
-              Phân loại
+            <div className='relative'>
+              <Button
+                variant='ghost'
+                onMouseOver={() =>
+                  setIsHovered({ categories: { header: true } })
+                }
+                onMouseLeave={() =>
+                  setIsHovered({ categories: { header: false } })
+                }
+              >
+                Phân loại
+              </Button>
+              {isHovered.categories?.header && (
+                <Dropdown
+                  data={categories}
+                  onClick={onCategoryClick}
+                  onMouseOver={() =>
+                    setIsHovered({ categories: { header: true } })
+                  }
+                  onMouseLeave={() =>
+                    setIsHovered({ categories: { header: false } })
+                  }
+                  className='left-0'
+                />
+              )}
+            </div>
+
+            <Button variant='ghost' onClick={onDishesManagementClick}>
+              Quản lý món
             </Button>
           </div>
-
-          {isHovered.bestSelling?.header && (
-            <Dropdown
-              data={bestSelling}
-              onClick={() => setIsHovered({ bestSelling: { header: false } })}
-              onMouseOver={() =>
-                setIsHovered({ bestSelling: { header: true } })
-              }
-              onMouseLeave={() =>
-                setIsHovered({ bestSelling: { header: false } })
-              }
-            />
-          )}
-
-          {isHovered.categories?.header && (
-            <Dropdown
-              data={categories}
-              onClick={onCategoryClick}
-              onMouseOver={() => setIsHovered({ categories: { header: true } })}
-              onMouseLeave={() =>
-                setIsHovered({ categories: { header: false } })
-              }
-              className='right-0'
-            />
-          )}
         </div>
       </div>
       <div className='justify-between items-center gap-6 flex'>
@@ -133,28 +175,46 @@ const Header = () => {
           className='ml-6 md:ml-0'
         />
 
-        <div className='hidden sm:flex'>
+        <div className='hidden sm:flex gap-6'>
           <Button variant='ghost'>
             <Link href='/transaction-history' className='text-inherit'>
               Lịch sử giao dịch
             </Link>
           </Button>
 
-          <Button variant='ghost'>
-            <Link href='/account' className='text-inherit'>
+          <div className='relative'>
+            <Button
+              variant='ghost'
+              onMouseOver={() => setIsHovered({ account: { header: true } })}
+              onMouseLeave={() => setIsHovered({ account: { header: false } })}
+            >
               Tài khoản
-            </Link>
-          </Button>
+            </Button>
+
+            {isHovered.account?.header && (
+              <Dropdown
+                data={accountDropdown}
+                onClick={onAccountClick}
+                onMouseOver={() => setIsHovered({ account: { header: true } })}
+                onMouseLeave={() =>
+                  setIsHovered({ account: { header: false } })
+                }
+                className='right-0'
+              />
+            )}
+          </div>
         </div>
-        
-        <Image
-          className='sm:hidden cursor-pointer hover:opacity-80 transition-opacity duration-200'
-          src='/images/bars-solid.svg'
-          alt='bar logo'
-          width={30}
-          height={30}
-          onClick={() => setIsOptionOpen((pre) => !pre)}
-        />
+
+        <div className='relative w-8 h-8 block sm:hidden'>
+          <Image
+            className='sm:hidden cursor-pointer hover:opacity-80 transition-opacity duration-200'
+            src='/images/bars-solid.svg'
+            alt='bar logo'
+            fill
+            sizes='32px'
+            onClick={() => setIsOptionOpen((pre) => !pre)}
+          />
+        </div>
       </div>
 
       {isOptionOpen && optionItems.length > 0 && (

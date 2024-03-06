@@ -20,7 +20,6 @@ export default function IdCategory({ params }: { params: { idCate: string } }) {
 
   // selectors
   const order = useAppSelector((state) => state.orderStore.order);
-  const allOrders = useAppSelector((state) => state.orderStore.allOrders);
 
   const dispatch = useAppDispatch();
 
@@ -73,7 +72,6 @@ export default function IdCategory({ params }: { params: { idCate: string } }) {
 
   useEffect(() => {
     setQuantity(1);
-    // setSelectedSize({ size: 'S', price: '0' });
   }, [open]);
 
   return (

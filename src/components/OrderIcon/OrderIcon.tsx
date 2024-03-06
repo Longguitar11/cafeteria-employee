@@ -14,7 +14,7 @@ const OrderIcon = (props: Props) => {
       )}
     >
       <div className='relative w-6 h-6'>
-        <Image src='/images/order-icon.png' alt='order icon' fill />
+        <Image src='/images/order-icon.png' alt='order icon' fill sizes='24px' />
       </div>
       {quantity > 0 && (
         <div className='absolute h-5 w-5 -bottom-1 -right-1 flex bg-green-500 rounded-full shadow'>

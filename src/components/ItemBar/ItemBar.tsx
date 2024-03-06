@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import { Props } from './ItemBar.models';
-import cns from 'classnames';
+import { cn } from '@/lib/utils';
 
 const ItemBar = (props: Props) => {
   const { className = '', url = '', text = '', onClick, onMouseLeave, onMouseOver } = props;
@@ -10,7 +10,7 @@ const ItemBar = (props: Props) => {
     <Link
       onClick={onClick}
       href={url}
-      className={cns('cursor-pointer hover:text-gray-400 transition-colors duration-200 p-3', className)}
+      className={cn('cursor-pointer hover:text-gray-400 transition-colors duration-200 p-3', className)}
       onMouseOver={onMouseOver}
       onMouseLeave={onMouseLeave}
     >
