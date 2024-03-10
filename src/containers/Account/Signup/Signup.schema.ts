@@ -16,27 +16,6 @@ export const SignupSchema = z
       .min(10, 'SĐT phải chứa 10 số!')
       .max(10, 'SĐT phải chứa 10 số!')
       .superRefine((val, ctx) => {
-        // if (val.length < 10) {
-        //   ctx.addIssue({
-        //     code: z.ZodIssueCode.too_small,
-        //     minimum: 10,
-        //     message: 'SĐT phải chứa 10 số!',
-        //     inclusive: true,
-        //     type: 'string',
-        //     fatal: true,
-        //   });
-        // }
-        // if (val.length > 10) {
-        //   ctx.addIssue({
-        //     code: z.ZodIssueCode.too_big,
-        //     maximum: 10,
-        //     message: 'SĐT phải chứa 10 số!',
-        //     inclusive: true,
-        //     type: 'string',
-        //     fatal: true,
-        //   });
-        // }
-
         if (!phoneRegex.test(val)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,

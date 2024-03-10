@@ -1,17 +1,17 @@
-import { DishInterface } from "@/types/dish"
+import { DishType } from "@/types/dish"
 import { DropdownData } from "@/types/dropdown"
 
 export interface Props {
     className?: string
-    dishes: DishInterface[]
+    dishes: DishType[]
+    allDishes: DishType[]
     //
-    setDishes: (dishes: DishInterface[]) => void
+    setDishes: (dishes: DishType[]) => void
 }
 
 export type CategoryFilterType = {
     className?: string
-    cateId: string
-    categories: DropdownData[]
+    cateId: number | null
     //
-    setCateId: (cateId: string) => void
+    setCateId: (cateId: number | null) => void
 }

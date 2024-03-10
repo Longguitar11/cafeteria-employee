@@ -1,8 +1,8 @@
 'use client';
 
-import { DishInterface } from '@/types/dish';
-import { OrderInterface } from '@/types/order';
-import { addString, calAmount } from '@/utils/dish';
+import { DishType } from '@/types/dish';
+import { OrderInterface, OrderedDishInterface } from '@/types/order';
+import { calAmount } from '@/utils/dish';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 interface OrderState {
@@ -10,190 +10,170 @@ interface OrderState {
   allOrders: OrderInterface[];
 }
 
+const defaultOrder: OrderInterface = {
+  name: '',
+  contactNumber: '',
+  email: '',
+  paymentMethod: '',
+  productDetail: [],
+  totalAmount: 0,
+};
+
 const initialState: OrderState = {
-  order: JSON.parse(
-    localStorage.getItem('order') || '{"idOrder": "", "dishes": []}'
-  ),
-  allOrders: JSON.parse(localStorage.getItem('allOrders') || '[]'),
+  order:
+    typeof window !== undefined &&
+    JSON.parse(localStorage.getItem('order') || JSON.stringify(defaultOrder)),
+
+  allOrders:
+    typeof window !== undefined &&
+    JSON.parse(localStorage.getItem('allOrders') || '[]'),
 };
 
 const OrderSlice = createSlice({
   name: 'orders',
   initialState,
   reducers: {
-    createOrder: (state, action: PayloadAction<DishInterface>) => {
-      const order: OrderInterface = {
-        dishes: [action.payload],
-        idOrder: new Date().getTime().toString(),
-        amount: action.payload.total,
-      };
-
-      state.order = order;
+    createOrder: (state, action: PayloadAction<OrderedDishInterface>) => {
+      state.order.productDetail = [action.payload];
 
       localStorage.setItem('order', JSON.stringify(state.order));
     },
-    updateOrder: (state, action: PayloadAction<DishInterface>) => {
-      const {
-        idDish,
-        idCate,
-        quantity = 1,
-        total = '0',
-      } = action.payload;
+    updateOrder: (state, action: PayloadAction<OrderedDishInterface>) => {
+      const { id, quantity = 1, total } = action.payload;
 
-      let sameDish = state.order.dishes.find(
-        (dish) => dish.idDish === idDish && dish.idCate === idCate
-      );
+      let sameDish = state.order.productDetail.find((dish) => dish.id === id);
 
       if (sameDish) {
-        // const sameSize = sameDish.details.find(
-        //   (detail) => detail.size === details[0].size
-        // );
-
-        // if (sameSize) {
-        //   sameDish.details.map((detail) =>
-        //     detail.size === details[0].size
-        //       ? {
-        //           ...detail,
-        //           quantity: (detail.quantity += details[0].quantity),
-        //         }
-        //       : detail
-        //   );
-        // } else {
-        //   sameDish.details = [...sameDish.details, details[0]];
-        // }
-
-        // sameDish.total = calTotal(sameDish.details);
-
-        const { quantity: quantitySameDish, total: totalSameDish = '0' } =
-          sameDish;
+        const { quantity: quantitySameDish, total: totalSameDish } = sameDish;
 
         sameDish.quantity = quantitySameDish + quantity;
-        sameDish.total = addString([totalSameDish, total]);
+        sameDish.total = totalSameDish + total;
 
-        state.order.dishes.map((dish) => {
-          dish.idDish === idDish ? sameDish : dish;
+        state.order.productDetail.map((dish) => {
+          dish.id === id ? sameDish : dish;
         });
       } else {
-        // action.payload.total = calTotal(details);
-        state.order.dishes = [...state.order.dishes, action.payload];
+        state.order.productDetail = [
+          ...state.order.productDetail,
+          action.payload,
+        ];
       }
 
-      state.order.amount = calAmount(state.order.dishes);
+      state.order.totalAmount = calAmount(state.order.productDetail);
 
       localStorage.setItem('order', JSON.stringify(state.order));
     },
-    addDishes: (state, action: PayloadAction<string[]>) => {
+    addDishes: (state, action: PayloadAction<number[]>) => {
       const dishIds = action.payload;
 
       const allDishes = JSON.parse(
         localStorage.getItem('allDishes') || '[]'
-      ) as DishInterface[];
-      const orderedDishIds = state.order.dishes.map(
-        ({ idDish }: DishInterface) => idDish
+      ) as DishType[];
+
+      const orderedDishIds = state.order.productDetail.map(
+        ({ id }: OrderedDishInterface) => id
       );
 
       for (let id of dishIds) {
-        const currentDish =
-          allDishes.length > 0 && allDishes.find((dish) => dish.idDish === id);
+        const currentDish = allDishes.find((dish) => dish.id! === id);
 
-        if (orderedDishIds.includes(id) && currentDish) {
-          const sameDish = state.order.dishes.find(
-            (dish) => dish.idDish === id
-          );
+        if (currentDish) {
+          const { id: dishId, name, price, categoryName } = currentDish;
 
-          if (sameDish) {
-            const { quantity, total = '0' } = sameDish;
-            sameDish.quantity = quantity + 1;
-            sameDish.total = addString([total, currentDish?.price]);
-
-            state.order.dishes.map((dish) =>
-              dish.idDish === id ? sameDish : dish
+          if (orderedDishIds.includes(id)) {
+            const sameDish = state.order.productDetail.find(
+              (dish) => dish.id === id
             );
+
+            if (sameDish) {
+              const { quantity, total } = sameDish;
+              sameDish.quantity = quantity + 1;
+              sameDish.total = total + currentDish.price;
+
+              state.order.productDetail.map((dish) =>
+                dish.id === id ? sameDish : dish
+              );
+            }
+          } else {
+            const newDish: OrderedDishInterface = {
+              id: dishId!,
+              category: categoryName!,
+              name,
+              price,
+              quantity: 1,
+              total: price,
+            };
+
+            state.order.productDetail.push(newDish);
           }
-        }
-
-        if (!orderedDishIds.includes(id) && currentDish) {
-          currentDish.quantity = 1;
-          currentDish.total = currentDish.price;
-
-          state.order.dishes.push(currentDish);
         }
       }
 
-      state.order.amount = calAmount(state.order.dishes);
+      state.order.totalAmount = calAmount(state.order.productDetail);
       localStorage.setItem('order', JSON.stringify(state.order));
     },
     updateDish: (
       state,
-      action: PayloadAction<{ idDish: string; quantity: number; total: string }>
+      action: PayloadAction<{ id: number; quantity: number; total: number }>
     ) => {
-      const { idDish, quantity, total } = action.payload;
+      const { id, quantity, total } = action.payload;
 
-      const foundDish = state.order.dishes.find(
-        (dish) => dish.idDish === idDish
+      const foundDish = state.order.productDetail.find(
+        (dish) => dish.id === id
       );
 
       if (foundDish) {
         foundDish.quantity = quantity;
         foundDish.total = total;
 
-        state.order.dishes.map((dish) =>
-          dish.idDish === idDish ? foundDish : dish
+        state.order.productDetail.map((dish) =>
+          dish.id === id ? foundDish : dish
         );
 
-        console.log({
-          editedDish: JSON.parse(JSON.stringify(state.order.dishes)),
-        });
-
-        state.order.amount = calAmount(state.order.dishes);
+        state.order.totalAmount = calAmount(state.order.productDetail);
 
         localStorage.setItem('order', JSON.stringify(state.order));
       }
     },
-    deleteDish: (
-      state,
-      action: PayloadAction<{ idCate: string; idDish: string }>
-    ) => {
-      const { idCate, idDish } = action.payload;
-
-      let dish = state.order.dishes.find(
-        (dish) => dish.idDish === idDish && dish.idCate === idCate
+    deleteDish: (state, action: PayloadAction<number>) => {
+      let dish = state.order.productDetail.find(
+        (dish) => dish.id === action.payload
       );
 
       if (dish) {
-        state.order.dishes = state.order.dishes.filter(
-          (dish) => dish.idCate !== idCate && dish.idDish !== idDish
+        state.order.productDetail = state.order.productDetail.filter(
+          (dish) => dish.id !== action.payload
         );
 
-        state.order = {
-          ...state.order,
-          amount: addString([state.order.amount!, dish?.total || '0']),
-        };
+        state.order.totalAmount = calAmount(state.order.productDetail);
+
+        localStorage.setItem('order', JSON.stringify(state.order));
       }
 
-      if (state.order.dishes.length === 0)
-        state.order = { idOrder: '', dishes: [] };
+      if (state.order.productDetail.length === 0) {
+        state.order = defaultOrder;
 
-      localStorage.setItem('order', JSON.stringify(state.order));
+        localStorage.removeItem('order');
+      }
     },
     cancelOrder: (state) => {
-      state.order = { idOrder: '', dishes: [] };
-      localStorage.setItem('order', JSON.stringify(state.order));
+      state.order = defaultOrder;
+      localStorage.removeItem('order');
     },
-    getOrder: (state, action: PayloadAction<string>) => {
-      const order = state.allOrders.find(
-        (order) => order.idOrder === action.payload
-      );
+    // getOrder: (state, action: PayloadAction<string>) => {
+    //   const order = state.allOrders.find(
+    //     (order) => order.idOrder === action.payload
+    //   );
 
-      if (order) state.order = order;
-    },
-    confirmOrder: (state) => {
-      state.allOrders = [...state.allOrders, state.order];
-      state.order = { idOrder: '', dishes: [] };
+    //   if (order) state.order = order;
+    // },
+    // confirmOrder: (state) => {
+    //   state.allOrders = [...state.allOrders, state.order];
+    //   state.order = { idOrder: '', dishes: [] };
 
-      localStorage.setItem('order', JSON.stringify(state.order));
-      localStorage.setItem('allOrders', JSON.stringify(state.allOrders));
-    },
+    //   localStorage.setItem('order', JSON.stringify(state.order));
+    //   localStorage.setItem('allOrders', JSON.stringify(state.allOrders));
+    // },
   },
 });
 
@@ -203,8 +183,8 @@ export const {
   updateDish,
   addDishes,
   deleteDish,
-  getOrder,
-  confirmOrder,
+  // getOrder,
+  // confirmOrder,
   cancelOrder,
 } = OrderSlice.actions;
 export default OrderSlice.reducer;

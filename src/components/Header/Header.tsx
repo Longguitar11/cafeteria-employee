@@ -1,29 +1,32 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { optionItems } from '@/constants/optionItems';
 import { Button } from '../ui/button';
 import { DropdownHoverType } from './Header.models';
-import { categories } from '@/constants/categories';
 import { bestSelling } from '@/constants/bestSelling';
 import { Dropdown } from '../Dropdown';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { OrderIcon } from '../OrderIcon';
-import { cancelOrder, confirmOrder, deleteDish } from '@/redux/orderSlice';
+import { cancelOrder, deleteDish } from '@/redux/orderSlice';
 import { cn } from '@/lib/utils';
-import { Options, OrderModal } from './Header.views';
+import { Options } from './Header.views';
 import { accountDropdown } from '@/constants/accountDropdown';
 import { useAuthContext } from '@/containers/Auth/Auth.context';
-import { jwtDecode } from 'jwt-decode';
+import { isExpriredToken } from '@/utils/token';
+import { categoriesDropdownData } from '@/utils/categories';
+import { getAllCategories } from '@/apis/category';
+import { getAllDishes } from '@/apis/dish';
+import { OrderModal } from '../Order';
 
 const Header = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { token, removeToken } = useAuthContext();
+  const { token } = useAuthContext();
 
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isOrderOpen, setIsOrderOpen] = useState<boolean>(false);
@@ -33,26 +36,21 @@ const Header = () => {
   });
 
   const order = useAppSelector((state) => state.orderStore.order);
+  const categories = useAppSelector((state) => state.categoryStore.categories);
 
-  const onCategoryClick = (id: string) => {
+  const onCategoryClick = (url: string) => {
     setIsHovered({ categories: { header: false } });
     if (isOptionOpen) setIsOptionOpen(false);
 
-    router.push(`/categories/${id}`);
+    router.push(url);
   };
 
-  const onDeleteClick = ({
-    idCate,
-    idDish,
-  }: {
-    idCate: string;
-    idDish: string;
-  }) => {
-    dispatch(deleteDish({ idCate, idDish }));
+  const onDeleteClick = (idDish: number) => {
+    dispatch(deleteDish(idDish));
   };
 
   const onPayClick = () => {
-    dispatch(confirmOrder());
+    // dispatch(confirmOrder());
     setIsOrderOpen(false);
   };
 
@@ -66,25 +64,39 @@ const Header = () => {
   };
 
   const onAccountClick = (url: string) => {
-    if (url === '/signin') {
-      removeToken();
-      router.push(url);
-    } else router.push(url);
+    if (url === '/signin' && typeof window !== undefined) {
+      localStorage.clear();
+    }
+    router.push(url);
   };
 
-  useEffect(() => {
-    if (token) {
-      const decodedJwt = jwtDecode(token);
+  const currentCategories = useMemo(
+    () => categoriesDropdownData(categories),
+    [categories]
+  );
 
-      if (decodedJwt.exp! * 1000 < Date.now()) {
-        console.log(decodedJwt.exp! * 1000, Date.now());
-        // logout
-        removeToken();
-        router.push('/signin');
-      }
+  const expriredToken = useMemo(() => {
+    if (token) return isExpriredToken(token);
+  }, [token]);
+
+  useEffect(() => {
+    if (expriredToken && typeof window !== undefined) {
+      localStorage.clear();
+      redirect('/signin');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [expriredToken]);
+
+  useEffect(() => {
+    if (!token) {
+      console.log('redirect to login');
+      redirect('/signin');
+    }
+
+    getAllCategories(dispatch);
+    getAllDishes(dispatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section
@@ -135,6 +147,10 @@ const Header = () => {
               )}
             </div>
 
+            <Button variant='ghost' onClick={() => router.push('/dish')}>
+              Món
+            </Button>
+
             <div className='relative'>
               <Button
                 variant='ghost'
@@ -147,9 +163,10 @@ const Header = () => {
               >
                 Phân loại
               </Button>
+
               {isHovered.categories?.header && (
                 <Dropdown
-                  data={categories}
+                  data={currentCategories}
                   onClick={onCategoryClick}
                   onMouseOver={() =>
                     setIsHovered({ categories: { header: true } })
@@ -162,16 +179,16 @@ const Header = () => {
               )}
             </div>
 
-            <Button variant='ghost' onClick={onDishesManagementClick}>
+            {/* <Button variant='ghost' onClick={onDishesManagementClick}>
               Quản lý món
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
       <div className='justify-between items-center gap-6 flex'>
         <OrderIcon
           onClick={() => setIsOrderOpen(true)}
-          quantity={order.dishes.length}
+          quantity={(order.productDetail && order.productDetail.length) || 0}
           className='ml-6 md:ml-0'
         />
 

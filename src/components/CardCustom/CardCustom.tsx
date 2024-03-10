@@ -7,14 +7,21 @@ import {
   CardHeader,
   CardTitle,
 } from '../ui/card';
-import Image from 'next/image';
 import { getValueString } from '@/utils/currency';
+import { cn } from '@/lib/utils';
 
 const CardCustom = (props: Props) => {
-  const { className = '', thumbnail, name, price, alt, onClick } = props;
+  const {
+    className = '',
+    name,
+    price = '10000',
+    status = true,
+    onClick,
+  } = props;
+
   return (
-    <Card className={className} onClick={onClick}>
-      <CardHeader>
+    <Card className={cn(!status && 'hidden', className)} onClick={onClick}>
+      {/* <CardHeader>
         <div className='relative h-96 sm:h-72'>
           <Image
             src={thumbnail}
@@ -24,10 +31,12 @@ const CardCustom = (props: Props) => {
             className='rounded-tl rounded-tr'
           />
         </div>
-      </CardHeader>
+      </CardHeader> */}
       <CardContent>
         <CardTitle>{name}</CardTitle>
-        <CardDescription>{getValueString(price)}</CardDescription>
+        <CardDescription>
+          {getValueString(price || '10000')}
+        </CardDescription>
       </CardContent>
     </Card>
   );

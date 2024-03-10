@@ -2,7 +2,7 @@
 
 import { toast } from 'react-toastify';
 import Axios from './axiosConfig';
-import axios, { AxiosHeaders } from 'axios';
+import axios from 'axios';
 
 interface SignupRequest {
   email: string;
@@ -25,8 +25,6 @@ export const signup = async (data: SignupRequest) => {
     if (status >= 200 && status < 400) {
       toast.success('Đăng ký tài khoản thành công!');
       return true;
-    } else {
-      toast.error('Email đăng ký đã tồn tại!');
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -96,46 +94,40 @@ export const forgotPassword = async (data: ForgotPasswordRequest) => {
   }
 };
 
-
 interface ChangePasswordRequest {
-    oldPassword: string;
-    newPassword: string;
-  }
-  
-  export const changePassword = async (data: ChangePasswordRequest) => {
-    const { oldPassword, newPassword } = data;
-  
-    try {
-      const { status, data } = await Axios.post('/user/changePassword', {
-        oldPassword, newPassword
-      });
-  
-      console.log({ status, data });
-  
-      if (status >= 200 && status < 400) {
-        toast.success('Đổi mật khẩu thành công!');
-        return true;
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data.message);
-      } else {
-        toast.error('Đã xảy ra lỗi không mong muốn!');
-      }
-    }
-  };
+  oldPassword: string;
+  newPassword: string;
+}
 
+export const changePassword = async (data: ChangePasswordRequest) => {
+  const { oldPassword, newPassword } = data;
+
+  try {
+    const { status, data } = await Axios.post('/user/changePassword', {
+      oldPassword,
+      newPassword,
+    });
+
+    console.log({ status, data });
+
+    if (status >= 200 && status < 400) {
+      toast.success('Đổi mật khẩu thành công!');
+      return true;
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      toast.error(error.response?.data.message);
+    } else {
+      toast.error('Đã xảy ra lỗi không mong muốn!');
+    }
+  }
+};
 
 export const checkToken = async () => {
-  console.log('check token api');
-
-  const token = localStorage.getItem('userToken');
-
   try {
     const { status, data } = await Axios.get('/user/checkToken');
 
     console.log({ status, data });
-
   } catch (error) {
     if (axios.isAxiosError(error)) {
       toast.error(error.response?.data.message);

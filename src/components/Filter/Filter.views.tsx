@@ -15,16 +15,19 @@ import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { CategoryFilterType } from './Filter.models';
+import { useAppSelector } from '@/redux/hook';
 
 export const CategoryFilter = (props: CategoryFilterType) => {
-  const { className = '', cateId, categories, setCateId } = props;
+  const { className = '', cateId, setCateId } = props;
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
 
+  const categories = useAppSelector((state) => state.categoryStore.categories);
+
   useEffect(() => {
-    const cate = categories.find((cate) => cate.value === value);
+    const cate = categories.find((cate) => cate.id === parseInt(value));
     if (cate && cate.id !== cateId) setCateId(cate.id);
-    if (value === '') setCateId('');
+    if (value === '') setCateId(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
@@ -38,7 +41,7 @@ export const CategoryFilter = (props: CategoryFilterType) => {
           className='w-[200px] justify-between'
         >
           {value
-            ? categories.find((cate) => cate.value === value)?.label
+            ? categories.find((cate) => cate.id === parseInt(value))?.name
             : 'Loại'}
           <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
         </Button>
@@ -51,7 +54,7 @@ export const CategoryFilter = (props: CategoryFilterType) => {
             {categories.map((cate) => (
               <CommandItem
                 key={cate.id}
-                value={cate.value}
+                value={cate.id.toString()}
                 onSelect={(currentValue) => {
                   setValue(currentValue === value ? '' : currentValue);
                   setOpen(false);
@@ -63,7 +66,7 @@ export const CategoryFilter = (props: CategoryFilterType) => {
                     cateId === cate.id ? 'opacity-100' : 'opacity-0'
                   )}
                 />
-                {cate.label}
+                {cate.name}
               </CommandItem>
             ))}
           </CommandGroup>

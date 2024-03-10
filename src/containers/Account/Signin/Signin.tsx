@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signin } from '@/apis/user';
 import { cn } from '@/lib/utils';
+import { PasswordInput } from '@/components/InputCustom';
 
 const Signin = (props: Props) => {
   const { className = '' } = props;
@@ -76,34 +77,15 @@ const Signin = (props: Props) => {
           )}
         />
 
-        <FormField
-          control={control}
-          name='password'
-          render={({ field }) => (
-            <FormItem>
-              <div className='flex justify-between'>
-                <FormLabel>Mật khẩu</FormLabel>
-                <FormLabel>
-                  <Link
-                    href='/forgot-password'
-                    className='text-green-500 hover:text-blue-400 transition-colors duration-150'
-                  >
-                    Quên mật khẩu?
-                  </Link>
-                </FormLabel>
-              </div>
-
-              <FormControl>
-                <Input
-                  type='password'
-                  placeholder='Nhập mật khẩu...'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className='relative'>
+          <PasswordInput control={control} name='password' />
+          <Link
+            href='/forgot-password'
+            className='absolute right-0 top-0 text-green-500 hover:text-blue-400 transition-colors duration-200'
+          >
+            Quên mật khẩu?
+          </Link>
+        </div>
 
         <Button type='submit' className='bg-green-500 w-full'>
           Đăng nhập

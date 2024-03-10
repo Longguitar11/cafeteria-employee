@@ -14,7 +14,7 @@ const Dropdown = (props: DropdownType) => {
   } = props;
 
   return (
-    <div className={cn('absolute shadow bg-gray-50 rounded w-fit', className)}>
+    <div className={cn('absolute shadow bg-gray-50 rounded min-w-full w-fit', className)}>
       {data.map((item, index) => (
         <div
           key={index}

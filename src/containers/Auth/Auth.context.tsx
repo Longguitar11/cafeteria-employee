@@ -2,29 +2,30 @@
 
 import React, { createContext, useState, ReactNode, useContext } from 'react';
 import { AuthContextInterface } from './Auth.models';
+import { getItemLS } from '@/utils/localStorage';
 
 export const AuthContext = createContext<AuthContextInterface>({
   token: '',
   setToken: () => {},
-  removeToken: () => {}
+  removeToken: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string>(
-    localStorage.getItem('userToken') || ''
+    getItemLS('userToken')!
   );
 
   const setNewToken = (newToken: string) => {
-    if(newToken !== token) {
-      localStorage.setItem('userToken', newToken)
-      setToken(newToken)
+    if (newToken !== token) {
+      localStorage.setItem('userToken', newToken);
+      setToken(newToken);
     }
-  }
+  };
 
   const removeToken = () => {
-    localStorage.removeItem('userToken')
-    setToken('')
-  }
+    localStorage.removeItem('userToken');
+    setToken('');
+  };
 
   return (
     <AuthContext.Provider value={{ token, setToken: setNewToken, removeToken }}>
@@ -34,4 +35,3 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useAuthContext = () => useContext(AuthContext);
-

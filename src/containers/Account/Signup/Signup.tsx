@@ -22,6 +22,7 @@ import { signup } from '@/apis/user';
 import { isBoolean } from 'lodash';
 import { error } from 'console';
 import { cn } from '@/lib/utils';
+import { PasswordInput } from '@/components/InputCustom';
 
 const Signup = (props: Props) => {
   const { className = '' } = props;
@@ -123,40 +124,13 @@ const Signup = (props: Props) => {
           )}
         />
 
-        <FormField
-          control={control}
-          name='password'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mật khẩu</FormLabel>
-              <FormControl>
-                <Input
-                  type='password'
-                  placeholder='Nhập mật khẩu...'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <PasswordInput control={control} name='password' />
 
-        <FormField
+        <PasswordInput
           control={control}
           name='confirm'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Xác nhận mật khẩu</FormLabel>
-              <FormControl>
-                <Input
-                  type='password'
-                  placeholder='Nhập lại mật khẩu...'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label='Xác nhận mật khẩu'
+          placeholder='Nhập lại mật khẩu...'
         />
 
         <Button type='submit' className='bg-green-500 w-full'>

@@ -1,67 +1,71 @@
 'use client';
 
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { categories } from '@/constants/categories';
-import { foodAndDrinks } from '@/constants/foodAndDrinks';
-import { Button } from '@/components/ui/button';
 import { CardCustom } from '@/components/CardCustom';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { getValueString } from '@/utils/currency';
 import { Quantity } from '@/components/Quantity';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { createOrder, updateOrder } from '@/redux/orderSlice';
+import { getValueString } from '@/utils/currency';
+import { getDishById } from '@/utils/dish';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Props } from './Dish.models';
 
-export default function IdCategory({ params }: { params: { idCate: string } }) {
-  // state
-  const [open, setOpen] = useState<boolean>(false);
-  const [cardId, setCardId] = useState<string>('');
-  const [quantity, setQuantity] = useState<number>(1);
-
-  // selectors
-  const order = useAppSelector((state) => state.orderStore.order);
+const Dish = (props: Props) => {
+  const { className } = props;
 
   const dispatch = useAppDispatch();
 
-  const category = categories.find((cate) => cate.id == params.idCate);
-  const products = foodAndDrinks.filter((item) => item.idCate == params.idCate);
-  const selectedCard = products.find((prod) => prod.idDish === cardId);
-  const total = (parseInt(selectedCard?.price || '0') * quantity).toString();
-  const amount = getValueString(total);
+  // state
+  const [open, setOpen] = useState<boolean>(false);
+  const [cardId, setCardId] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
 
-  const onCardClick = (id: string) => {
+  const allDishes = useAppSelector((state) => state.dishStore.allDishes);
+  const order = useAppSelector((state) => state.orderStore.order);
+
+  // useMemo
+  const selectedCard = useMemo(
+    () => getDishById(allDishes, cardId),
+    [cardId, allDishes]
+  );
+
+  // variables
+  const total = selectedCard?.price! * quantity;
+  const amount = getValueString(total.toString());
+
+  // function
+  const onCardClick = (id: number) => {
     setOpen(true);
     setCardId(id);
   };
 
   const onAddToOrderSummit = () => {
-    const product = products.find((product) => product.idDish === cardId);
+    if (selectedCard) {
+      const { id, name, price, categoryName } = selectedCard;
 
-    if (product) {
-      const { idDish, idCate, name, price, thumbnail } = product;
+      console.log({ selectedCard });
 
-      if (order.dishes.length === 0) {
+      if (order.productDetail.length === 0) {
         dispatch(
           createOrder({
-            idDish,
-            idCate,
+            id: id!,
             name,
-            thumbnail,
             quantity,
             price,
             total,
+            category: categoryName!,
           })
         );
       } else {
         dispatch(
           updateOrder({
-            idDish,
-            idCate,
+            id: id!,
             name,
-            thumbnail,
             quantity,
-            price,
+            price: price,
             total,
+            category: categoryName!,
           })
         );
       }
@@ -70,40 +74,41 @@ export default function IdCategory({ params }: { params: { idCate: string } }) {
     setOpen(false);
   };
 
+  // useEffect
   useEffect(() => {
     setQuantity(1);
   }, [open]);
 
   return (
-    <section className='py-10 px-10'>
+    <section className={className}>
       <p className='text-gray-700 text-3xl font-medium uppercase border-b-[0.5px] border-gray-400'>
-        {category?.label}
+        TẤT CẢ CÁC MÓN
       </p>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-10'>
-        {products.length > 0 ? (
-          products.map((prod) => {
-            const { idDish, thumbnail, name, price } = prod;
+        {allDishes.length > 0 ? (
+          allDishes.map((dish) => {
+            const { id, name, price, status } = dish;
             return (
               <CardCustom
-                key={idDish}
-                onClick={() => onCardClick(idDish)}
-                thumbnail={thumbnail}
+                key={id}
                 name={name}
-                price={price}
+                price={price.toString()}
+                status={status === 'true'}
+                onClick={() => onCardClick(id!)}
               />
             );
           })
         ) : (
-          <div>Không có sản phẩm!</div>
+          <div>Không có món nào!</div>
         )}
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className='sm:max-w-[800px] flex gap-4 p-4'>
-          <div className='flex-1 relative h-96'>
+          {/* <div className='flex-1 relative h-96'>
             <Image src={selectedCard?.thumbnail || ''} alt='thumbnail' fill />
-          </div>
+          </div> */}
 
           <div className='flex-1 flex flex-col justify-between'>
             <div className='space-y-3'>
@@ -112,7 +117,7 @@ export default function IdCategory({ params }: { params: { idCate: string } }) {
               </p>
 
               <p className='text-xl text-red-500'>
-                {getValueString(selectedCard?.price || '0')}
+                {getValueString((selectedCard?.price || 0).toString())}
               </p>
 
               {/* <Size value={selectedSize.size} onClick={setSelectedSize} /> */}
@@ -138,4 +143,6 @@ export default function IdCategory({ params }: { params: { idCate: string } }) {
       </Dialog>
     </section>
   );
-}
+};
+
+export default Dish;

@@ -1,6 +1,7 @@
+import { getItemLS } from '@/utils/localStorage';
 import axios from 'axios';
 
-const token = localStorage.getItem('userToken');
+const token = getItemLS('userToken');
 
 const Axios = axios.create({
   // Configuration
