@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CategoryFilterType } from './Filter.models';
 import { useAppSelector } from '@/redux/hook';
 
@@ -25,7 +25,7 @@ export const CategoryFilter = (props: CategoryFilterType) => {
   const categories = useAppSelector((state) => state.categoryStore.categories);
 
   useEffect(() => {
-    const cate = categories.find((cate) => cate.id === parseInt(value));
+    const cate = categories.find((cate) => cate.value === value);
     if (cate && cate.id !== cateId) setCateId(cate.id);
     if (value === '') setCateId(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -41,7 +41,7 @@ export const CategoryFilter = (props: CategoryFilterType) => {
           className='w-[200px] justify-between'
         >
           {value
-            ? categories.find((cate) => cate.id === parseInt(value))?.name
+            ? categories.find((cate) => cate.value === value)?.name
             : 'Loại'}
           <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
         </Button>
@@ -53,8 +53,8 @@ export const CategoryFilter = (props: CategoryFilterType) => {
           <CommandGroup>
             {categories.map((cate) => (
               <CommandItem
-                key={cate.id}
-                value={cate.id.toString()}
+                key={cate.value}
+                value={cate.value}
                 onSelect={(currentValue) => {
                   setValue(currentValue === value ? '' : currentValue);
                   setOpen(false);

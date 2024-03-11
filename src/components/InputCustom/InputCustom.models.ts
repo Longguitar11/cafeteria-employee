@@ -1,8 +1,8 @@
-import { Control, FieldValues } from 'react-hook-form';
+import { Control } from 'react-hook-form';
 
 export interface Props {
-  control:     Control<{[x: string]: any}> | undefined;
-  name:        string;
-  label:       string;
+  control: Control<any>;
+  name: string;
+  label: string;
   placeholder: string;
 }

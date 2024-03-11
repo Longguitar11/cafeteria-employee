@@ -1,1 +1,1 @@
-export type HeaderType = 'CATEGORIES' | 'BESTSELLING' | 'TRANSACTIONHISTORY' | 'ACCOUNT';
+export type OptionType = 'CATEGORY' | 'BESTSELLING' | 'TRANSACTIONHISTORY' | 'ACCOUNT';

@@ -49,18 +49,9 @@ const Header = () => {
     dispatch(deleteDish(idDish));
   };
 
-  const onPayClick = () => {
-    // dispatch(confirmOrder());
-    setIsOrderOpen(false);
-  };
-
   const onConfirmCancelClick = () => {
     dispatch(cancelOrder());
     setIsOrderOpen(false);
-  };
-
-  const onDishesManagementClick = () => {
-    router.push('/dishes-management');
   };
 
   const onAccountClick = (url: string) => {
@@ -154,6 +145,7 @@ const Header = () => {
             <div className='relative'>
               <Button
                 variant='ghost'
+                onClick={() => router.push('/category')}
                 onMouseOver={() =>
                   setIsHovered({ categories: { header: true } })
                 }
@@ -178,10 +170,6 @@ const Header = () => {
                 />
               )}
             </div>
-
-            {/* <Button variant='ghost' onClick={onDishesManagementClick}>
-              Quản lý món
-            </Button> */}
           </div>
         </div>
       </div>
@@ -235,13 +223,7 @@ const Header = () => {
       </div>
 
       {isOptionOpen && optionItems.length > 0 && (
-        <Options
-          isOpen={isOptionOpen}
-          isHover={isHovered}
-          setIsOpen={setIsOptionOpen}
-          setIsHover={setIsHovered}
-          onCategoryClick={onCategoryClick}
-        />
+        <Options isOpen={isOptionOpen} setIsOpen={setIsOptionOpen} />
       )}
 
       <OrderModal
@@ -249,7 +231,6 @@ const Header = () => {
         setIsOpen={setIsOrderOpen}
         order={order}
         onConfirmCancelClick={onConfirmCancelClick}
-        onPayClick={onPayClick}
         onDeleteClick={onDeleteClick}
       />
     </section>

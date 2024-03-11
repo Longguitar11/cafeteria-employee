@@ -1,14 +1,14 @@
-import { HeaderType } from "@/types/header";
+import { OptionType } from "@/types/header";
 
-export const optionItems: { key: HeaderType, url: string, text: string }[] = [
+export const optionItems: { key: OptionType, url?: string, text: string }[] = [
     {
         key: 'BESTSELLING',
         url: '/best-selling',
         text: 'Bán chạy'
     },
     {
-        key: 'CATEGORIES',
-        url: '/categories',
+        key: 'CATEGORY',
+        url: '/category',
         text: 'Phân loại'
     },
     {
@@ -18,7 +18,6 @@ export const optionItems: { key: HeaderType, url: string, text: string }[] = [
     },
     {
         key: 'ACCOUNT',
-        url: '/account',
         text: 'Tài khoản'
     },
 ]

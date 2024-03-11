@@ -23,7 +23,7 @@ const Quantity = (props: Props) => {
       >
         -
       </Button>
-      <span className='text-lg font-semibold text-center'>{quantity}</span>
+      <span className='text-2xl font-semibold text-center'>{quantity}</span>
       <Button
         variant='outline'
         className='text-lg font-semibold'

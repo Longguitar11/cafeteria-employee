@@ -17,10 +17,6 @@ export type DropdownHoverType = {
 export type OptionsType = {
   className?: string;
   isOpen: boolean;
-  isHover: DropdownHoverType;
   //
   setIsOpen: (value: boolean) => void;
-  setIsHover: (value: DropdownHoverType) => void;
-  onCategoryClick: (id: string) => void;
 };
-

@@ -1,9 +1,8 @@
-import React from 'react'
+import { Category } from '@/containers/Category';
+import React from 'react';
 
 const CategoriesPage = () => {
-  return (
-    <div className='p-10'>CategoriesPage</div>
-  )
-}
+  return <Category className='p-10' />;
+};
 
-export default CategoriesPage
+export default CategoriesPage;

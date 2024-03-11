@@ -9,18 +9,20 @@ import {
 } from '../ui/card';
 import { getValueString } from '@/utils/currency';
 import { cn } from '@/lib/utils';
+import { productNumOfCate } from '@/utils/categories';
 
 const CardCustom = (props: Props) => {
-  const {
-    className = '',
-    name,
-    price = '10000',
-    status = true,
-    onClick,
-  } = props;
+  const { className = '', id, name, price, status = true, onClick } = props;
 
   return (
-    <Card className={cn(!status && 'hidden', className)} onClick={onClick}>
+    <Card
+      className={cn(
+        'border-[1px] p-3 hover:border-green-500 transition-colors duration-200',
+        !status && 'hidden',
+        className
+      )}
+      onClick={onClick}
+    >
       {/* <CardHeader>
         <div className='relative h-96 sm:h-72'>
           <Image
@@ -33,10 +35,13 @@ const CardCustom = (props: Props) => {
         </div>
       </CardHeader> */}
       <CardContent>
-        <CardTitle>{name}</CardTitle>
-        <CardDescription>
-          {getValueString(price || '10000')}
-        </CardDescription>
+        <CardTitle>
+          {name}{' '}
+          <span className='text-green-500'>
+            {productNumOfCate(id!) ? `(${productNumOfCate(id!)})` : ''}
+          </span>
+        </CardTitle>
+        {price && <CardDescription>{getValueString(price)}</CardDescription>}
       </CardContent>
     </Card>
   );

@@ -1,5 +1,5 @@
 export interface OrderedDishInterface {
-  id: number;
+  id?: number;
   name: string;
   category: string;
   quantity: number;
@@ -15,5 +15,3 @@ export interface OrderInterface {
   productDetail: OrderedDishInterface[];
   totalAmount: number;
 }
-
-

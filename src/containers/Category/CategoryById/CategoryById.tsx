@@ -72,7 +72,7 @@ export default function CategoryById(props: Props) {
             id: id!,
             name,
             quantity,
-            price: price,
+            price,
             total,
             category: categoryName!,
           })

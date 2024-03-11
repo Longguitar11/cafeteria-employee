@@ -1,9 +1,17 @@
 import { toast } from 'react-toastify';
 import Axios from './axiosConfig';
 import axios from 'axios';
-import { OrderInterface } from '@/types/order';
 
-export const generateReport = async (data: OrderInterface) => {
+export interface generateReportInterface {
+  name: string;
+  contactNumber: string;
+  email: string;
+  paymentMethod: string;
+  productDetail: string;
+  totalAmount: string;
+}
+
+export const generateReport = async (data: generateReportInterface) => {
   const {
     name,
     contactNumber,

@@ -2,6 +2,7 @@
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { CategoryType } from '@/types/category';
+import { escapeText } from '@/utils/text';
 
 export interface CategoriesState {
   categories: CategoryType[];
@@ -16,7 +17,11 @@ const CategoriesSlice = createSlice({
   initialState,
   reducers: {
     getCategories: (state, action: PayloadAction<CategoryType[]>) => {
-      state.categories = action.payload;
+      state.categories = action.payload.map((cate) =>
+        !cate.value
+          ? { ...cate, value: escapeText(cate.name).toLowerCase() }
+          : cate
+      );
       localStorage.setItem('categories', JSON.stringify(state.categories));
     },
   },

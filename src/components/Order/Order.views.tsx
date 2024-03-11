@@ -8,9 +8,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { useEffect, useState } from 'react';
 import { DishType } from '@/types/dish';
-import { AddDishType, EditDishType } from './Order.models';
+import { AddDishType, EditDishType, PaymentButtonType } from './Order.models';
 import { addDishes } from '@/redux/orderSlice';
 import { getAllDishes } from '@/apis/dish';
 import { Button } from '../ui/button';
@@ -18,6 +26,12 @@ import { Filter } from '../Filter';
 import { cn } from '@/lib/utils';
 import { getValueString } from '@/utils/currency';
 import { Quantity } from '../Quantity';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { PaymentForm, PaymentSchema } from '@/schemas/payment';
+import { InputCustom } from '../InputCustom';
+import { paymentMethod } from '@/constants/paymentMethod';
+import { Checkbox } from '../ui/checkbox';
 
 export const AddDish = (props: AddDishType) => {
   const { className, buttonClassName } = props;
@@ -48,7 +62,10 @@ export const AddDish = (props: AddDishType) => {
       <DialogTrigger asChild>
         <Button
           variant='outline'
-          className={cn('border-green-500 hover:bg-green-500 hover:text-white transition-colors duration-200', buttonClassName)}
+          className={cn(
+            'border-green-500 hover:bg-green-500 hover:text-white transition-colors duration-200',
+            buttonClassName
+          )}
         >
           Thêm món
         </Button>
@@ -174,7 +191,7 @@ export const EditDish = (props: EditDishType) => {
                   <Button
                     type='submit'
                     variant='success'
-                    onClick={() => onEditDishSubmit(dish.id)}
+                    onClick={() => onEditDishSubmit(dish.id!)}
                   >
                     Xác nhận
                   </Button>
@@ -183,6 +200,97 @@ export const EditDish = (props: EditDishType) => {
             </DialogFooter>
           </div>
         </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export const PaymentButton = (props: PaymentButtonType) => {
+  const { className, open, setOpen, onSubmit } = props;
+
+  const form = useForm<PaymentForm>({
+    resolver: zodResolver(PaymentSchema),
+    mode: 'onSubmit',
+    defaultValues: {
+      email: '',
+      contactNumber: '',
+      name: '',
+      paymentMethod: 'CASH',
+    },
+  });
+
+  const { control, handleSubmit } = form;
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className={cn('w-[500px] max-w-[700px]', className)}>
+        <DialogHeader>
+          <DialogTitle className='text-3xl text-center'>THANH TOÁN</DialogTitle>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className={cn('space-y-3 mx-auto w-full', className)}
+          >
+            <InputCustom
+              control={control}
+              name='name'
+              label='Tên khách hàng'
+              placeholder='Nhập tên khách hàng...'
+            />
+            <InputCustom
+              control={control}
+              name='email'
+              label='Email khách hàng'
+              placeholder='Nhập email khách hàng...'
+            />
+            <InputCustom
+              control={control}
+              name='contactNumber'
+              label='SĐT khách hàng'
+              placeholder='Nhập SĐT khách hàng...'
+            />
+
+            <FormField
+              control={control}
+              name='paymentMethod'
+              render={({ field: { onChange, value } }) => (
+                <FormItem>
+                  <FormLabel>Phương thức thanh toán</FormLabel>
+                  <div className='flex gap-3'>
+                    {paymentMethod.length > 0 &&
+                      paymentMethod.map((item) => (
+                        <div
+                          key={item.value}
+                          onClick={() => onChange(item.value)}
+                          className={cn(
+                            'flex-1 p-3 text-center rounded shadow border-[0.5px] hover:border-green-500 transition-colors duration-200 cursor-pointer',
+                            value === item.value && 'border-green-500'
+                          )}
+                        >
+                          {item.name}
+                        </div>
+                      ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant='outline' className='flex-1'>
+                  Quay lại
+                </Button>
+              </DialogClose>
+
+              <Button type='submit' variant='success' className='flex-1'>
+                Xác nhận
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

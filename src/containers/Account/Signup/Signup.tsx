@@ -34,8 +34,8 @@ const Signup = (props: Props) => {
     mode: 'onSubmit',
     defaultValues: {
       email: '',
-      phoneNumber: '',
-      username: '',
+      contactNumber: '',
+      name: '',
       password: '',
       confirm: '',
     },
@@ -43,22 +43,22 @@ const Signup = (props: Props) => {
 
   const {
     control,
-    formState: { errors, isValid },
+    formState: { isValid },
     handleSubmit,
   } = form;
 
   const onSignupSubmit = ({
     email,
-    phoneNumber,
-    username,
+    contactNumber,
+    name,
     password,
   }: SignupForm) => {
-    console.log({ email, phoneNumber, username, password });
+    console.log({ email, contactNumber, name, password });
     if (isValid) {
       const res = signup({
         email,
-        name: username,
-        contactNumber: phoneNumber,
+        name,
+        contactNumber,
         password,
       });
 
@@ -98,7 +98,7 @@ const Signup = (props: Props) => {
 
         <FormField
           control={control}
-          name='phoneNumber'
+          name='contactNumber'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Số điện thoại</FormLabel>
@@ -112,7 +112,7 @@ const Signup = (props: Props) => {
 
         <FormField
           control={control}
-          name='username'
+          name='name'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Tên đăng nhập</FormLabel>

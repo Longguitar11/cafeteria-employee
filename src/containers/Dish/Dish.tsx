@@ -105,13 +105,13 @@ const Dish = (props: Props) => {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className='sm:max-w-[800px] flex gap-4 p-4'>
+        <DialogContent className='sm:max-w-[400px] flex gap-4 p-4'>
           {/* <div className='flex-1 relative h-96'>
             <Image src={selectedCard?.thumbnail || ''} alt='thumbnail' fill />
           </div> */}
 
           <div className='flex-1 flex flex-col justify-between'>
-            <div className='space-y-3'>
+            <div className='space-y-3 mb-5'>
               <p className='text-3xl font-semibold'>
                 {selectedCard?.name || ''}
               </p>

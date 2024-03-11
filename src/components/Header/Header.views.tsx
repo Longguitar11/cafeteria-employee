@@ -1,45 +1,29 @@
-import React from 'react';
-
-import { Button } from '../ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '../ui/alert-dialog';
-import { OptionsType } from './Header.models';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { optionItems } from '@/constants/optionItems';
-import { ItemBar } from '../ItemBar';
+import { accountDropdown } from '@/constants/accountDropdown';
+import { OptionsType } from './Header.models';
 import { Dropdown } from '../Dropdown';
-import { bestSelling } from '@/constants/bestSelling';
-import { categories } from '@/constants/categories';
-import { HeaderType } from '@/types/header';
 import './style.css';
 
 export const Options = (props: OptionsType) => {
-  const {
-    className = '',
-    isHover,
-    isOpen,
-    setIsOpen,
-    setIsHover,
-    onCategoryClick,
-  } = props;
+  const { className = '', isOpen, setIsOpen } = props;
 
-  const onMouseOptionOver = (key: HeaderType) => {
-    if (key === 'CATEGORIES') setIsHover({ categories: { option: true } });
-    if (key === 'BESTSELLING') setIsHover({ bestSelling: { option: true } });
-  };
+  const router = useRouter();
 
-  const onMouseOptionLeave = (key: HeaderType) => {
-    if (key === 'CATEGORIES') setIsHover({ categories: { option: false } });
-    if (key === 'BESTSELLING') setIsHover({ bestSelling: { option: false } });
+  const [isAccountHover, setIsAccountHover] = useState<boolean>(false);
+
+  const onDropdownClick = (url: string) => {
+    setIsAccountHover(false);
+
+    // clear all items of localStorage
+    if (url === '/signin' && typeof window !== undefined) {
+      localStorage.clear();
+    }
+
+    router.push(url);
   };
 
   return (
@@ -50,36 +34,42 @@ export const Options = (props: OptionsType) => {
         className
       )}
     >
-      {optionItems.map((item, index) => (
-        <ItemBar
-          key={index}
-          url={item.url}
-          text={item.text}
-          onClick={() => setIsOpen(false)}
-          onMouseOver={() => onMouseOptionOver(item.key)}
-          onMouseLeave={() => onMouseOptionLeave(item.key)}
-        />
-      ))}
+      {optionItems.map((item, index) => {
+        return (
+          <>
+            {item.key !== 'ACCOUNT' ? (
+              <Link
+                key={index}
+                href={item.url!}
+                onClick={() => setIsOpen(false)}
+                className='cursor-pointer hover:text-gray-400 transition-colors duration-200 p-3'
+              >
+                {item.text}
+              </Link>
+            ) : (
+              <div className='relative'>
+                <div
+                  className='cursor-pointer hover:text-gray-400 transition-colors duration-200 p-3'
+                  onMouseOver={() => setIsAccountHover(true)}
+                  onMouseLeave={() => setIsAccountHover(false)}
+                >
+                  {item.text}
+                </div>
 
-      {isHover.bestSelling?.option && (
-        <Dropdown
-          data={bestSelling}
-          onClick={() => setIsHover({ bestSelling: { option: false } })}
-          onMouseLeave={() => setIsHover({ bestSelling: { option: false } })}
-          onMouseOver={() => setIsHover({ bestSelling: { option: true } })}
-          className='right-[146px]'
-        />
-      )}
-
-      {isHover.categories?.option && (
-        <Dropdown
-          data={categories}
-          onClick={onCategoryClick}
-          onMouseLeave={() => setIsHover({ categories: { option: false } })}
-          onMouseOver={() => setIsHover({ categories: { option: true } })}
-          className='top-14 right-[146px]'
-        />
-      )}
+                {isAccountHover && (
+                  <Dropdown
+                    data={accountDropdown}
+                    onClick={onDropdownClick}
+                    onMouseLeave={() => setIsAccountHover(false)}
+                    onMouseOver={() => setIsAccountHover(true)}
+                    className='-left-[147px] top-0'
+                  />
+                )}
+              </div>
+            )}
+          </>
+        );
+      })}
     </div>
   );
 };

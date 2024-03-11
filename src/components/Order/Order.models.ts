@@ -1,3 +1,4 @@
+import { PaymentForm } from '@/schemas/payment';
 import { OrderInterface, OrderedDishInterface } from '@/types/order';
 import { SetStateAction } from 'react';
 
@@ -8,7 +9,6 @@ export interface Props {
   //
   setIsOpen: (value: boolean) => void;
   onConfirmCancelClick: () => void;
-  onPayClick: () => void;
   onDeleteClick: (idDish: number) => void;
 }
 
@@ -25,4 +25,12 @@ export type EditDishType = {
 export type AddDishType = {
   className?: string;
   buttonClassName?: string;
+};
+
+export type PaymentButtonType = {
+  className?: string;
+  open: boolean;
+  //
+  setOpen: (value: boolean) => void;
+  onSubmit: (values: PaymentForm) => void;
 };

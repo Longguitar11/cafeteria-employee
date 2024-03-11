@@ -1,29 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { DropdownType } from '@/types/dropdown';
-import { calculateProductQuantity } from './Dropdown.utils';
-import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useAppSelector } from '@/redux/hook';
+import { productNumOfCate } from '@/utils/categories';
 
 const Dropdown = (props: DropdownType) => {
-  const {
-    className = '',
-    data,
-    onClick,
-    onMouseLeave,
-    onMouseOver,
-  } = props;
+  const { className = '', data, onClick, onMouseLeave, onMouseOver } = props;
 
   return (
-    <div className={cn('absolute shadow bg-gray-50 rounded min-w-full w-fit', className)}>
+    <div
+      className={cn(
+        'absolute shadow bg-gray-50 rounded min-w-full w-fit',
+        className
+      )}
+    >
       {data.map((item, index) => (
         <div
           key={index}
           onMouseOver={onMouseOver}
           onMouseLeave={onMouseLeave}
           onClick={() => {
-              item.url ?  
-               onClick(item.url)
-              : onClick(item.id)
+            item.url ? onClick(item.url) : onClick(item.id);
           }}
           className={cn(
             'cursor-pointer p-3 text-gray-800 hover:bg-white transition-all duration-200',
@@ -32,13 +29,9 @@ const Dropdown = (props: DropdownType) => {
           )}
         >
           {item.label}{' '}
-          {item.url ? (
-            ''
-          ) : (
+          {item.url?.includes('category') && (
             <span className='text-red-500'>
-              {calculateProductQuantity(item.id)
-                ? `(${calculateProductQuantity(item.id)})`
-                : '(0)'}
+              {`(${productNumOfCate(parseInt(item.id))})`}
             </span>
           )}
         </div>
