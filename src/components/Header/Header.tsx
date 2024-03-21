@@ -4,23 +4,21 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { optionItems } from '@/constants/optionItems';
-import { Button } from '../ui/button';
 import { DropdownHoverType } from './Header.models';
-import { bestSelling } from '@/constants/bestSelling';
-import { Dropdown } from '../Dropdown';
 import { redirect, useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
-import { OrderIcon } from '../OrderIcon';
 import { cancelOrder, deleteDish } from '@/redux/orderSlice';
 import { cn } from '@/lib/utils';
-import { Options } from './Header.views';
 import { accountDropdown } from '@/constants/accountDropdown';
 import { useAuthContext } from '@/containers/Auth/Auth.context';
 import { isExpriredToken } from '@/utils/token';
 import { categoriesDropdownData } from '@/utils/categories';
-import { getAllCategories } from '@/apis/category';
-import { getAllDishes } from '@/apis/dish';
+import { Button } from '../ui/button';
+import { Dropdown } from '../Dropdown';
+import { OrderIcon } from '../OrderIcon';
 import { OrderModal } from '../Order';
+import { Options } from './Header.views';
+import { getAllCategories } from '@/apis/category';
 
 const Header = () => {
   const router = useRouter();
@@ -32,7 +30,6 @@ const Header = () => {
   const [isOrderOpen, setIsOrderOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<DropdownHoverType>({
     categories: { header: false, option: false },
-    bestSelling: { header: false, option: false },
   });
 
   const order = useAppSelector((state) => state.orderStore.order);
@@ -85,7 +82,6 @@ const Header = () => {
     }
 
     getAllCategories(dispatch);
-    getAllDishes(dispatch);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -110,34 +106,6 @@ const Header = () => {
 
         <div className='relative hidden sm:block'>
           <div className='flex gap-6'>
-            <div className='relative'>
-              <Button
-                variant='ghost'
-                onMouseOver={() =>
-                  setIsHovered({ bestSelling: { header: true } })
-                }
-                onMouseLeave={() =>
-                  setIsHovered({ bestSelling: { header: false } })
-                }
-              >
-                Bán chạy
-              </Button>
-              {isHovered.bestSelling?.header && (
-                <Dropdown
-                  data={bestSelling}
-                  onClick={() =>
-                    setIsHovered({ bestSelling: { header: false } })
-                  }
-                  onMouseOver={() =>
-                    setIsHovered({ bestSelling: { header: true } })
-                  }
-                  onMouseLeave={() =>
-                    setIsHovered({ bestSelling: { header: false } })
-                  }
-                />
-              )}
-            </div>
-
             <Button variant='ghost' onClick={() => router.push('/dish')}>
               Món
             </Button>

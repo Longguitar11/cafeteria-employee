@@ -1,14 +1,18 @@
 'use client';
 
 import { DishType } from '@/types/dish';
-import { OrderInterface, OrderedDishInterface } from '@/types/order';
+import {
+  BillInterface,
+  OrderInterface,
+  OrderedDishInterface,
+} from '@/types/order';
 import { calAmount } from '@/utils/dish';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 
 interface OrderState {
   order: OrderInterface;
-  allOrders: OrderInterface[];
+  allOrders: BillInterface[];
 }
 
 const defaultOrder: OrderInterface = {
@@ -83,50 +87,28 @@ const OrderSlice = createSlice({
         localStorage.getItem('allDishes') || '[]'
       ) as DishType[];
 
-      const orderedDishIds = state.order.productDetail.map(
-        ({ id }: OrderedDishInterface) => id
-      );
-
       for (let id of dishIds) {
         const currentDish = allDishes.find((dish) => dish.id! === id);
 
         if (currentDish) {
           const { id: dishId, name, price, categoryName } = currentDish;
 
-          if (orderedDishIds.includes(id)) {
-            const sameDish = state.order.productDetail.find(
-              (dish) => dish.id === id
-            );
+          const newDish: OrderedDishInterface = {
+            id: dishId!,
+            category: categoryName!,
+            name,
+            price,
+            quantity: 1,
+            total: price,
+          };
 
-            if (sameDish) {
-              const { quantity, total } = sameDish;
-              sameDish.quantity = quantity + 1;
-              sameDish.total = total + currentDish.price;
-
-              state.order.productDetail.map((dish) =>
-                dish.id === id ? sameDish : dish
-              );
-
-              toast.success(`Số lượng ${sameDish.name.toLowerCase()} thêm 1!`);
-            }
-          } else {
-            const newDish: OrderedDishInterface = {
-              id: dishId!,
-              category: categoryName!,
-              name,
-              price,
-              quantity: 1,
-              total: price,
-            };
-
-            state.order.productDetail.push(newDish);
-            toast.success(`${name} được thêm vào đơn hàng!`);
-          }
+          state.order.productDetail.push(newDish);
         }
       }
-
+      
       state.order.totalAmount = calAmount(state.order.productDetail);
       localStorage.setItem('order', JSON.stringify(state.order));
+      toast.success(`Đơn hàng đã được thêm món!`);
     },
     updateDish: (
       state,
@@ -191,12 +173,14 @@ const OrderSlice = createSlice({
 
     //   if (order) state.order = order;
     // },
+    getAllOrders: (state, action: PayloadAction<BillInterface[]>) => {
+      state.allOrders = action.payload;
+      localStorage.setItem('allOrders', JSON.stringify(state.allOrders));
+    },
     completeOrder: (state) => {
-      state.allOrders = [...state.allOrders, state.order];
       state.order = defaultOrder;
 
       localStorage.removeItem('order');
-      localStorage.setItem('allOrders', JSON.stringify(state.allOrders));
       toast.success(`Thanh toán đơn hàng thành công!`);
     },
   },
@@ -208,6 +192,7 @@ export const {
   updateDish,
   addDishes,
   deleteDish,
+  getAllOrders,
   // getOrder,
   completeOrder,
   cancelOrder,

@@ -11,10 +11,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 import { cn } from '@/lib/utils';
 import { useEffect, useMemo, useState } from 'react';
-import { CategoryFilterType } from './Filter.models';
+import { CategoryFilterType } from './DishFilter.models';
 import { useAppSelector } from '@/redux/hook';
 
 export const CategoryFilter = (props: CategoryFilterType) => {

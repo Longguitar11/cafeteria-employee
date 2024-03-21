@@ -8,6 +8,7 @@ export interface Props {
   name: string;
   price?: string;
   status?: boolean;
+  category?: string;
   //
   onClick: React.MouseEventHandler<HTMLDivElement> | undefined;
 }

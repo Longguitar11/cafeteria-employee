@@ -1,5 +1,9 @@
+import { paymentMethods } from '@/constants/paymentMethod';
 import { phoneRegex } from '@/constants/phoneRegex';
+import { PaymentMethod } from '@/types/paymentMethod';
 import { z } from 'zod';
+
+const paymentMethodTypes = paymentMethods.map(({value}: { label: string; value: PaymentMethod }) => value ) as [string, ...string[]] 
 
 export const PaymentSchema = z.object({
   name: z.string().min(1, 'Vui lòng nhập tên khách hàng!'),
@@ -16,7 +20,7 @@ export const PaymentSchema = z.object({
         });
       }
     }),
-  paymentMethod: z.enum(['CASH','TRANSFER']),
+  paymentMethod: z.enum([...paymentMethodTypes]),
 });
 
 export type PaymentForm = z.infer<typeof PaymentSchema>;

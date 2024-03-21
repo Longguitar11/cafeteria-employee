@@ -28,6 +28,7 @@ import { Button } from '../ui/button';
 import { PaymentForm } from '@/schemas/payment';
 import { generateReport } from '@/apis/order';
 import { OrderedDishInterface } from '@/types/order';
+import { getDateTime } from '@/utils/datetime';
 
 const OrderModal = (props: Props) => {
   const {
@@ -79,14 +80,18 @@ const OrderModal = (props: Props) => {
         })
       );
 
-      generateReport({
-        contactNumber,
-        email,
-        name,
-        paymentMethod,
-        productDetail: JSON.stringify(productDetail),
-        totalAmount: order.totalAmount.toString(),
-      });
+      generateReport(
+        {
+          contactNumber,
+          email,
+          name,
+          paymentMethod,
+          productDetail: JSON.stringify(productDetail),
+          totalAmount: order.totalAmount.toString(),
+          createdAt: getDateTime(new Date()),
+        },
+        dispatch
+      );
 
       dispatch(completeOrder());
       setIsOpen(false);
@@ -98,7 +103,7 @@ const OrderModal = (props: Props) => {
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
-          className={cn('min-w-[800px] max-w-[1000px]', className)}
+          className={cn('sm:min-w-[800px] sm:max-w-[1000px]', className)}
         >
           <DialogHeader>
             <DialogTitle className='text-3xl text-center'>ĐƠN HÀNG</DialogTitle>
@@ -108,7 +113,7 @@ const OrderModal = (props: Props) => {
             <>
               <AddDish />
 
-              <Table>
+              <Table className='w-full'>
                 <TableHeader className='w-full table table-fixed'>
                   <TableRow>
                     <TableHead className='w-12'>STT</TableHead>
@@ -121,7 +126,7 @@ const OrderModal = (props: Props) => {
                   </TableRow>
                 </TableHeader>
 
-                <TableBody className='max-h-[355.2px] overflow-y-auto hidden-scrollbar block'>
+                <TableBody className='max-h-[362px] overflow-y-auto hidden-scrollbar block'>
                   {order.productDetail.map((dish, index) => (
                     <TableRow
                       className='w-full table table-fixed'
@@ -155,6 +160,7 @@ const OrderModal = (props: Props) => {
                         <div className='flex justify-center gap-3'>
                           <AlertDialogCustom
                             buttonTitle='Xóa'
+                            alertTitle={dish.name + ' ra khỏi đơn'}
                             onSubmit={() => onDeleteClick(dish.id!)}
                           />
 

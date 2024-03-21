@@ -12,6 +12,7 @@ import { getDishesByCateId } from '@/apis/dish';
 import { getDishById } from '@/utils/dish';
 import { getCategoryById } from '@/utils/categories';
 import { Props } from './CategoryById.models';
+import { DishModal } from '@/components/DishModal';
 
 export default function CategoryById(props: Props) {
   const { className, idCate } = props;
@@ -52,8 +53,6 @@ export default function CategoryById(props: Props) {
   const onAddToOrderSummit = () => {
     if (selectedCard) {
       const { id, name, price, categoryName } = selectedCard;
-
-      console.log({ selectedCard });
 
       if (order.productDetail.length === 0) {
         dispatch(
@@ -118,43 +117,15 @@ export default function CategoryById(props: Props) {
         )}
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className='sm:max-w-[800px] flex gap-4 p-4'>
-          {/* <div className='flex-1 relative h-96'>
-            <Image src={selectedCard?.thumbnail || ''} alt='thumbnail' fill />
-          </div> */}
-
-          <div className='flex-1 flex flex-col justify-between'>
-            <div className='space-y-3'>
-              <p className='text-3xl font-semibold'>
-                {selectedCard?.name || ''}
-              </p>
-
-              <p className='text-xl text-red-500'>
-                {getValueString((selectedCard?.price || 0).toString())}
-              </p>
-
-              {/* <Size value={selectedSize.size} onClick={setSelectedSize} /> */}
-              <Quantity quantity={quantity} setQuantity={setQuantity} />
-            </div>
-
-            <div className='space-y-3'>
-              <p className='text-xl text-end'>
-                Thành tiền:{' '}
-                <span className='font-medium text-red-500'>{amount}</span>
-              </p>
-              <Button
-                type='submit'
-                variant='success'
-                className='w-full'
-                onClick={onAddToOrderSummit}
-              >
-                Thêm vào đơn hàng
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <DishModal
+        amount={amount}
+        open={open}
+        quantity={quantity}
+        onSubmit={onAddToOrderSummit}
+        setOpen={setOpen}
+        selectedCard={selectedCard!}
+        setQuantity={setQuantity}
+      />
     </section>
   );
 }

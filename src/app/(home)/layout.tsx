@@ -7,6 +7,7 @@ import StoreProvider from '../StoreProvider';
 import { AuthProvider } from '@/containers/Auth';
 import '../globals.css';
 import { cn } from '@/lib/utils';
+import Script from 'next/script';
 
 const quicksand = Quicksand({ subsets: ['vietnamese'] });
 
@@ -45,6 +46,14 @@ export default function RootLayout({
               {children}
             </div>
           </body>
+          <Script
+            strategy='afterInteractive'
+            src='https://app.tudongchat.com/js/chatbox.js'
+          ></Script>
+          <Script strategy='lazyOnload' id='autochatbot'>
+            {`const tudong_chatbox = new TuDongChat("9lJAIHNFOtR9ys7LK3Oow")
+            tudong_chatbox.initial()`}
+          </Script>
         </html>
       </StoreProvider>
     </AuthProvider>

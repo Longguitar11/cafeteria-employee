@@ -1,4 +1,3 @@
-import { foodAndDrinks } from '@/constants/foodAndDrinks';
 import { CategoryType } from '@/types/category';
 import { DishType } from '@/types/dish';
 import { escapeText } from '@/utils/text';

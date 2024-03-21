@@ -9,11 +9,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '../ui/alert-dialog';
-import { Button } from '../ui/button';
+import { Button, buttonVariants } from '../ui/button';
 import { Props } from './AlertDialogCustom.models';
 
 const AlertDialogCustom = (props: Props) => {
-  const { className = '', buttonTitle, onSubmit } = props;
+  const { className = '', buttonTitle, alertTitle, onSubmit } = props;
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -25,7 +25,10 @@ const AlertDialogCustom = (props: Props) => {
         <AlertDialogHeader>
           <AlertDialogTitle>
             Bạn có chắc chắn muốn{' '}
-            <span className='lowercase'>{buttonTitle}</span>?
+            <span className='lowercase'>
+              {buttonTitle} {alertTitle}
+            </span>
+            ?
           </AlertDialogTitle>
           <AlertDialogDescription>
             Thao tác này không thể hoàn tác. Bạn vẫn muốn tiếp tục chứ?
@@ -33,7 +36,12 @@ const AlertDialogCustom = (props: Props) => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Quay lại</AlertDialogCancel>
-          <AlertDialogAction onClick={onSubmit}>Đồng ý</AlertDialogAction>
+          <AlertDialogAction
+            className={buttonVariants({ variant: 'destructive' })}
+            onClick={onSubmit}
+          >
+            Đồng ý
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

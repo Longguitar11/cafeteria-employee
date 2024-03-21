@@ -7,26 +7,27 @@ const Quantity = (props: Props) => {
   const { className = '', quantity = 1, setQuantity } = props;
 
   const onSubtractClick = () => {
-    if (quantity > 1) setQuantity((pre) => --pre);
+    let result = quantity - 1;
+    if (quantity > 1) setQuantity(result);
   };
 
   const onAddClick = () => {
-    console.log(quantity < 101);
-    if (quantity < 101) setQuantity((pre) => ++pre);
+    let result = quantity + 1;
+    if (quantity < 101) setQuantity(result);
   };
   return (
     <div className={cn('grid items-center gap-3 grid-cols-3', className)}>
       <Button
-        variant='outline'
-        className='text-lg font-semibold'
+        variant='destructive'
+        className='text-2xl font-semibold'
         onClick={onSubtractClick}
       >
         -
       </Button>
-      <span className='text-2xl font-semibold text-center'>{quantity}</span>
+      <span className='text-2xl h-full font-semibold text-center'>{quantity}</span>
       <Button
-        variant='outline'
-        className='text-lg font-semibold'
+        variant='primary'
+        className='text-2xl font-semibold'
         onClick={onAddClick}
       >
         +

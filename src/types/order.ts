@@ -15,3 +15,16 @@ export interface OrderInterface {
   productDetail: OrderedDishInterface[];
   totalAmount: number;
 }
+
+export interface BillInterface {
+  id: number;
+  uuid: string;
+  createdBy: string;
+  name: string;
+  contactNumber: string;
+  email: string;
+  paymentMethod: string;
+  productDetail: string;
+  total: number;
+  createdAt: string
+}

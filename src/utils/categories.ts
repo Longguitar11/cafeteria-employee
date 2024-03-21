@@ -24,7 +24,7 @@ export const productNumOfCate = (id: number) => {
       localStorage.getItem('allDishes') || '[]'
     );
     const numOfProPerCate = dishes.filter(
-      (dish) => dish.categoryId === id
+      (dish) => dish.categoryId === id && dish.status === 'true'
     ).length;
 
     return numOfProPerCate;

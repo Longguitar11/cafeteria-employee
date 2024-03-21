@@ -16,13 +16,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DishType } from '@/types/dish';
 import { AddDishType, EditDishType, PaymentButtonType } from './Order.models';
 import { addDishes } from '@/redux/orderSlice';
 import { getAllDishes } from '@/apis/dish';
 import { Button } from '../ui/button';
-import { Filter } from '../Filter';
+import { DishFilter } from '../Filter';
 import { cn } from '@/lib/utils';
 import { getValueString } from '@/utils/currency';
 import { Quantity } from '../Quantity';
@@ -30,8 +30,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PaymentForm, PaymentSchema } from '@/schemas/payment';
 import { InputCustom } from '../InputCustom';
-import { paymentMethod } from '@/constants/paymentMethod';
-import { Checkbox } from '../ui/checkbox';
+import { paymentMethods } from '@/constants/paymentMethod';
+import { OrderedDishInterface } from '@/types/order';
 
 export const AddDish = (props: AddDishType) => {
   const { className, buttonClassName } = props;
@@ -39,6 +39,7 @@ export const AddDish = (props: AddDishType) => {
   const dispatch = useAppDispatch();
 
   const allDishes = useAppSelector((state) => state.dishStore.allDishes);
+  const order = useAppSelector((state) => state.orderStore.order);
 
   const [dishes, setDishes] = useState<DishType[]>(allDishes);
   const [dishIds, setDishIds] = useState<number[]>([]);
@@ -47,6 +48,14 @@ export const AddDish = (props: AddDishType) => {
     if (!dishIds.includes(idDish)) setDishIds((pre) => [...pre, idDish]);
     else setDishIds((dishIds) => dishIds.filter((id) => id !== idDish));
   };
+
+  const orderedDishIds = useMemo(() => {
+    const orderedIds = order.productDetail.map(
+      ({ id }: OrderedDishInterface) => id
+    );
+
+    return orderedIds || [];
+  }, [order.productDetail]);
 
   const onSubmit = () => {
     dispatch(addDishes(dishIds));
@@ -81,17 +90,27 @@ export const AddDish = (props: AddDishType) => {
           </DialogTitle>
         </DialogHeader>
         <div className='space-y-3'>
-          <Filter allDishes={allDishes} dishes={dishes} setDishes={setDishes} />
+          <DishFilter
+            allDishes={allDishes}
+            dishes={dishes}
+            setDishes={setDishes}
+          />
 
           {dishes.length > 0 ? (
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 max-h-[332px] overflow-y-auto hidden-scrollbar'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 max-h-[296px] overflow-y-auto hidden-scrollbar'>
               {dishes.map((dish) => (
                 <div
                   key={dish.id}
-                  onClick={() => onDishClick(dish.id!)}
+                  onClick={() => {
+                    !orderedDishIds.includes(dish.id!) && onDishClick(dish.id!);
+                  }}
                   className={cn(
-                    'flex gap-3 items-center rounded border-[0.5px] border-gray-300 hover:border-green-500 transition-colors duration-200 p-3 cursor-pointer',
-                    dishIds.includes(dish.id!) && 'border-green-500'
+                    'flex gap-3 justify-between items-center rounded border-[1.5px] border-gray-300 hover:border-red-400 transition-colors duration-200 p-3 cursor-pointer',
+                    (dishIds.includes(dish.id!) ||
+                      orderedDishIds.includes(dish.id!)) &&
+                      'border-red-500',
+                    orderedDishIds.includes(dish.id!) &&
+                      'bg-gray-200 border-none'
                   )}
                 >
                   {/* <div className='relative w-12 h-12'>
@@ -104,6 +123,9 @@ export const AddDish = (props: AddDishType) => {
                     </div> */}
 
                   <p className='font-light'>{dish.name}</p>
+                  <span className='font-light text-red-500'>
+                    {orderedDishIds.includes(dish.id!) && 'Đã chọn'}
+                  </span>
                 </div>
               ))}
             </div>
@@ -147,6 +169,14 @@ export const EditDish = (props: EditDishType) => {
     setQuantity,
   } = props;
 
+  const allDishes = useAppSelector((state) => state.dishStore.allDishes);
+
+  const selectedDish = useMemo(() => {
+    const selectedDish = allDishes.find((d) => d.id === dish.id);
+
+    if (selectedDish) return selectedDish;
+  }, [dish, allDishes]);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -158,21 +188,30 @@ export const EditDish = (props: EditDishType) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className={cn('sm:max-w-[800px] p-4', className)}>
+      <DialogContent className={cn('sm:min-w-[500px] p-4', className)}>
         <div className='flex gap-4'>
           {/* <div className='flex-1 relative h-96'>
               <Image src={dish?.thumbnail || ''} alt='thumbnail' fill />
             </div> */}
 
-          <div className='flex-1 flex flex-col justify-between'>
+          <div className='flex-1 flex flex-col justify-between gap-8'>
             <div className='space-y-3'>
-              <p className='text-3xl font-semibold'>{dish?.name || ''}</p>
+              <p className='text-3xl font-semibold'>{dish?.name}</p>
 
-              <p className='text-xl text-red-500'>
-                {getValueString(dish.price.toString())}
+              <div className='flex gap-4 items-center'>
+                <p className='text-xl text-amber-500'>
+                  {getValueString((dish?.price || 0).toString())}
+                </p>
+
+                <span className=' border-2 border-green-500 px-2 text-green-600 rounded'>
+                  {selectedDish?.categoryName}
+                </span>
+              </div>
+
+              <p className='text-base text-gray-400'>
+                Mô tả: {selectedDish?.description}
               </p>
 
-              {/* <Size value={selectedSize.size} onClick={setSelectedSize} /> */}
               <Quantity quantity={quantity} setQuantity={setQuantity} />
             </div>
 
@@ -184,13 +223,16 @@ export const EditDish = (props: EditDishType) => {
                 </span>
               </p>
               <div className='w-full flex gap-3'>
-                <DialogClose>
-                  <Button variant='secondary'>Hủy bỏ</Button>
+                <DialogClose asChild>
+                  <Button variant='secondary' className='flex-1'>
+                    Hủy bỏ
+                  </Button>
                 </DialogClose>
-                <DialogClose asChild className='w-full'>
+                <DialogClose asChild>
                   <Button
                     type='submit'
                     variant='success'
+                    className='flex-1'
                     onClick={() => onEditDishSubmit(dish.id!)}
                   >
                     Xác nhận
@@ -223,7 +265,10 @@ export const PaymentButton = (props: PaymentButtonType) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className={cn('w-[500px] max-w-[700px]', className)}>
+      <DialogContent
+        className={cn('w-[500px] max-w-[700px]', className)}
+        onCloseAutoFocus={() => form.reset()}
+      >
         <DialogHeader>
           <DialogTitle className='text-3xl text-center'>THANH TOÁN</DialogTitle>
         </DialogHeader>
@@ -259,19 +304,18 @@ export const PaymentButton = (props: PaymentButtonType) => {
                 <FormItem>
                   <FormLabel>Phương thức thanh toán</FormLabel>
                   <div className='flex gap-3'>
-                    {paymentMethod.length > 0 &&
-                      paymentMethod.map((item) => (
-                        <div
-                          key={item.value}
-                          onClick={() => onChange(item.value)}
-                          className={cn(
-                            'flex-1 p-3 text-center rounded shadow border-[0.5px] hover:border-green-500 transition-colors duration-200 cursor-pointer',
-                            value === item.value && 'border-green-500'
-                          )}
-                        >
-                          {item.name}
-                        </div>
-                      ))}
+                    {paymentMethods.map((item) => (
+                      <div
+                        key={item.value}
+                        onClick={() => onChange(item.value)}
+                        className={cn(
+                          'flex-1 p-3 text-center rounded shadow border-[0.5px] hover:border-green-500 transition-colors duration-200 cursor-pointer',
+                          value === item.value && 'border-green-500', item.value === 'ALL' && 'hidden'
+                        )}
+                      >
+                        {item.label}
+                      </div>
+                    ))}
                   </div>
                   <FormMessage />
                 </FormItem>

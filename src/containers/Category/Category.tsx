@@ -1,17 +1,24 @@
 'use client';
 
 import { CardCustom } from '@/components/CardCustom';
-import { useAppSelector } from '@/redux/hook';
+import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Props } from './Category.models';
+import { getAllCategories } from '@/apis/category';
 
 const Category = (props: Props) => {
   const { className } = props;
 
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   const categories = useAppSelector((state) => state.categoryStore.categories);
+
+  useEffect(() => {
+    getAllCategories(dispatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section className={className}>
@@ -33,7 +40,7 @@ const Category = (props: Props) => {
             );
           })
         ) : (
-          <div>Không có món nào!</div>
+          <div>Không có loại nào!</div>
         )}
       </div>
     </section>

@@ -1,15 +1,14 @@
 'use client';
 
-import { CardCustom } from '@/components/CardCustom';
-import { Quantity } from '@/components/Quantity';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { createOrder, updateOrder } from '@/redux/orderSlice';
+import { CardCustom } from '@/components/CardCustom';
+import { DishModal } from '@/components/DishModal';
 import { getValueString } from '@/utils/currency';
 import { getDishById } from '@/utils/dish';
-import React, { useEffect, useMemo, useState } from 'react';
 import { Props } from './Dish.models';
+import { getAllDishes } from '@/apis/dish';
 
 const Dish = (props: Props) => {
   const { className } = props;
@@ -44,8 +43,6 @@ const Dish = (props: Props) => {
     if (selectedCard) {
       const { id, name, price, categoryName } = selectedCard;
 
-      console.log({ selectedCard });
-
       if (order.productDetail.length === 0) {
         dispatch(
           createOrder({
@@ -79,6 +76,11 @@ const Dish = (props: Props) => {
     setQuantity(1);
   }, [open]);
 
+  useEffect(() => {
+    getAllDishes(dispatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <section className={className}>
       <p className='text-gray-700 text-3xl font-medium uppercase border-b-[0.5px] border-gray-400'>
@@ -88,11 +90,12 @@ const Dish = (props: Props) => {
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-10'>
         {allDishes.length > 0 ? (
           allDishes.map((dish) => {
-            const { id, name, price, status } = dish;
+            const { id, name, categoryName, price, status } = dish;
             return (
               <CardCustom
                 key={id}
                 name={name}
+                category={categoryName!}
                 price={price.toString()}
                 status={status === 'true'}
                 onClick={() => onCardClick(id!)}
@@ -104,43 +107,15 @@ const Dish = (props: Props) => {
         )}
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className='sm:max-w-[400px] flex gap-4 p-4'>
-          {/* <div className='flex-1 relative h-96'>
-            <Image src={selectedCard?.thumbnail || ''} alt='thumbnail' fill />
-          </div> */}
-
-          <div className='flex-1 flex flex-col justify-between'>
-            <div className='space-y-3 mb-5'>
-              <p className='text-3xl font-semibold'>
-                {selectedCard?.name || ''}
-              </p>
-
-              <p className='text-xl text-red-500'>
-                {getValueString((selectedCard?.price || 0).toString())}
-              </p>
-
-              {/* <Size value={selectedSize.size} onClick={setSelectedSize} /> */}
-              <Quantity quantity={quantity} setQuantity={setQuantity} />
-            </div>
-
-            <div className='space-y-3'>
-              <p className='text-xl text-end'>
-                Thành tiền:{' '}
-                <span className='font-medium text-red-500'>{amount}</span>
-              </p>
-              <Button
-                type='submit'
-                variant='success'
-                className='w-full'
-                onClick={onAddToOrderSummit}
-              >
-                Thêm vào đơn hàng
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <DishModal
+        amount={amount}
+        onSubmit={onAddToOrderSummit}
+        open={open}
+        quantity={quantity}
+        selectedCard={selectedCard!}
+        setOpen={setOpen}
+        setQuantity={setQuantity}
+      />
     </section>
   );
 };
