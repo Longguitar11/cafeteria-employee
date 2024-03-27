@@ -34,8 +34,6 @@ const TransactionFilter = (props: Props) => {
   });
   const timerUpdateSearchText = useRef<NodeJS.Timeout | null>(null);
 
-  console.log({ paymentMethod });
-
   const reset = () => {
     setSearchValue('');
     setPaymentMethod('ALL');

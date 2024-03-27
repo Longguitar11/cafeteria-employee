@@ -24,8 +24,6 @@ import { BillInterface, OrderedDishInterface } from '@/types/order';
 import { getBills } from '@/apis/order';
 import { TransactionFilter } from '@/components/Filter';
 import { paymentMethods } from '@/constants/paymentMethod';
-import { getDateTime } from '@/utils/datetime';
-import { getSumOfTotal } from './TransactionHistory.utils';
 
 const TransactionHistory = (props: Props) => {
   const { className } = props;
@@ -39,12 +37,19 @@ const TransactionHistory = (props: Props) => {
   const [orderId, setOrderId] = useState<number>(0);
   const [isShowSum, setIsShowSum] = useState<boolean>(false);
 
-  console.log({ bills });
-
   const selectedOrder = useMemo(() => {
     const selectedOrder = bills.find((order) => order.id === orderId);
     if (selectedOrder) return selectedOrder;
   }, [orderId, bills]);
+
+  const sumOfTotal = useMemo(() => {
+    console.log('calc')
+    let sum = 0;
+    for (const bill of bills) {
+      sum += bill.total;
+    }
+    return getValueString(sum.toString());
+  }, [bills]);
 
   // set bills when all orders updated
   useEffect(() => {
@@ -74,10 +79,10 @@ const TransactionHistory = (props: Props) => {
           {bills.length > 0 && (
             <div className='flex justify-end items-center gap-3 mb-4'>
               {isShowSum && (
-                <p className='text-xl font-medium text-amber-500 transition-transform -translate-x-5 duration-200'>{getSumOfTotal(bills)}</p>
+                <p className='text-xl font-medium text-sky-500 transition-transform -translate-x-5 duration-200'>{sumOfTotal}</p>
               )}
               <Button
-                variant='success'
+                variant='warning'
                 onClick={() => setIsShowSum((pre) => !pre)}
               >
                 Xem tổng tiền

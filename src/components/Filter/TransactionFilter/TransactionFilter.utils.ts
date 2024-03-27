@@ -14,13 +14,6 @@ export const filterOptions = (
 ): BillInterface[] => {
   const { text = '', paymentMethod, fromTime, toTime } = options;
 
-  console.log({
-    text,
-    paymentMethod,
-    fromTime: fromTime ? fromTime.getDate() : undefined,
-    toTime: toTime ? toTime.getDate() : undefined,
-  });
-
   if (text === '' && !paymentMethod && !fromTime && !toTime) return allBills;
   else if (text !== '' && !paymentMethod && !fromTime && !toTime) {
     console.log('text');
