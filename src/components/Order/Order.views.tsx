@@ -10,7 +10,6 @@ import {
 } from '../ui/dialog';
 import {
   Form,
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
@@ -135,9 +134,9 @@ export const AddDish = (props: AddDishType) => {
             </p>
           )}
 
-          <DialogFooter className='justify-between items-center'>
+          <DialogFooter className='justify-between items-center '>
             <DialogClose asChild>
-              <Button variant='secondary' className='flex-1'>
+              <Button variant='secondary' className='w-full sm:flex-1'>
                 Hủy bỏ
               </Button>
             </DialogClose>
@@ -145,7 +144,7 @@ export const AddDish = (props: AddDishType) => {
               <Button
                 type='submit'
                 variant='success'
-                className='flex-1'
+                className='w-full sm:flex-1'
                 disabled={dishIds.length === 0}
                 onClick={onSubmit}
               >

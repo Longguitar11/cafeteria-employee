@@ -65,11 +65,11 @@ const TransactionFilter = (props: Props) => {
   }, [allBills]);
 
   return (
-    <div className={cn('flex gap-3', className)}>
+    <div className={cn('flex flex-col sm:flex-row gap-3', className)}>
       <Input
         type='text'
         placeholder='Tìm hóa đơn (theo id, email NV, tên KH, sđt KH, email KH)'
-        className='text-base'
+        className='text-base w-full sm:w-auto'
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
       />
@@ -80,7 +80,7 @@ const TransactionFilter = (props: Props) => {
             id='date'
             variant={'outline'}
             className={cn(
-              'w-[300px] justify-start text-left font-normal',
+              'w-full sm:w-[300px] justify-start text-left font-normal',
               !date && 'text-muted-foreground'
             )}
           >
@@ -115,7 +115,7 @@ const TransactionFilter = (props: Props) => {
         value={paymentMethod}
         onValueChange={(value: PaymentMethod) => setPaymentMethod(value)}
       >
-        <SelectTrigger className='w-[300px]'>
+        <SelectTrigger className='flex-1 sm:w-[300px]'>
           <SelectValue placeholder='Phương thức thanh toán' />
         </SelectTrigger>
         <SelectContent>

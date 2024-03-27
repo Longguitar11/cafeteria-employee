@@ -1,1 +1,1 @@
-export type OptionType = 'CATEGORY' | 'BESTSELLING' | 'TRANSACTIONHISTORY' | 'ACCOUNT';
+export type OptionType = 'CATEGORY' | 'DISH' | 'TRANSACTIONHISTORY' | 'ACCOUNT';
