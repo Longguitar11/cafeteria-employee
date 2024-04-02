@@ -3,15 +3,14 @@
 import { toast } from 'react-toastify';
 import Axios from './axiosConfig';
 import axios from 'axios';
-import { getAllDishesReducer, getDishesReducer } from '@/redux/dishSlice';
 
-export const getAllDishes = async (dispatch: any) => {
+export const getAllDishes = async () => {
   try {
     const { status, data } = await Axios.get('/product/get');
 
     console.log({ status, data });
     if (status >= 200 && status < 400) {
-      dispatch(getAllDishesReducer(data));
+      return data;
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -22,14 +21,14 @@ export const getAllDishes = async (dispatch: any) => {
   }
 };
 
-export const getDishesByCateId = async (cateId: number, dispatch: any) => {
+export const getDishesByCateId = async (cateId: number) => {
   try {
     const { status, data } = await Axios.get(`/product/getByCategory/${cateId}`);
 
     console.log({ status, data });
     
     if (status >= 200 && status < 400) {
-      dispatch(getDishesReducer(data));
+      return data;
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

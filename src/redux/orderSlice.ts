@@ -80,14 +80,10 @@ const OrderSlice = createSlice({
 
       localStorage.setItem('order', JSON.stringify(state.order));
     },
-    addDishes: (state, action: PayloadAction<number[]>) => {
-      const dishIds = action.payload;
+    addDishes: (state, action: PayloadAction<{ids: number[], allDishes: DishType[]}>) => {
+      const {ids, allDishes} = action.payload;
 
-      const allDishes = JSON.parse(
-        localStorage.getItem('allDishes') || '[]'
-      ) as DishType[];
-
-      for (let id of dishIds) {
+      for (let id of ids) {
         const currentDish = allDishes.find((dish) => dish.id! === id);
 
         if (currentDish) {
@@ -166,13 +162,6 @@ const OrderSlice = createSlice({
 
       toast.success(`Hủy đơn hàng thành công!`);
     },
-    // getOrder: (state, action: PayloadAction<string>) => {
-    //   const order = state.allOrders.find(
-    //     (order) => order.idOrder === action.payload
-    //   );
-
-    //   if (order) state.order = order;
-    // },
     getAllOrders: (state, action: PayloadAction<BillInterface[]>) => {
       state.allOrders = action.payload;
       localStorage.setItem('allOrders', JSON.stringify(state.allOrders));
@@ -193,7 +182,6 @@ export const {
   addDishes,
   deleteDish,
   getAllOrders,
-  // getOrder,
   completeOrder,
   cancelOrder,
 } = OrderSlice.actions;

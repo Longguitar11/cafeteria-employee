@@ -20,13 +20,13 @@ export const getCategoryById = (categories: CategoryType[], id: number) => {
 
 export const productNumOfCate = (id: number) => {
   if (typeof window !== undefined) {
-    const dishes: DishType[] = JSON.parse(
-      localStorage.getItem('allDishes') || '[]'
+    const categoryIds: number[] = JSON.parse(
+      localStorage.getItem('categoryIds') || '[]'
     );
-    const numOfProPerCate = dishes.filter(
-      (dish) => dish.categoryId === id && dish.status === 'true'
+    const numOfProPerCate = categoryIds.filter(
+      (cateId) => cateId === id
     ).length;
 
-    return numOfProPerCate;
+    return numOfProPerCate > 0 ? `(${numOfProPerCate})` : '';
   }
 };

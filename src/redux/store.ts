@@ -1,13 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import orderSlice from './orderSlice';
-import dishSlice from './dishSlice';
 import categorySlice from './categorySlice';
 
 export const store = () => {
   return configureStore({
     reducer: {
       orderStore: orderSlice,
-      dishStore: dishSlice,
       categoryStore: categorySlice,
     },
   });

@@ -1,4 +1,5 @@
 import { PaymentForm } from '@/schemas/payment';
+import { DishType } from '@/types/dish';
 import { OrderInterface, OrderedDishInterface } from '@/types/order';
 import { SetStateAction } from 'react';
 
@@ -16,6 +17,7 @@ export type EditDishType = {
   className?: string;
   dish: OrderedDishInterface;
   quantity: number;
+  allDishes: DishType[]
   //
   calTotalDish: (price: string) => string;
   setQuantity: (value: SetStateAction<number>) => void;
@@ -25,6 +27,7 @@ export type EditDishType = {
 export type AddDishType = {
   className?: string;
   buttonClassName?: string;
+  allDishes: DishType[]
 };
 
 export type PaymentButtonType = {

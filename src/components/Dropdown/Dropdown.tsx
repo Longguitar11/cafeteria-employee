@@ -1,7 +1,6 @@
-import React, { useMemo } from 'react';
-import { DropdownType } from '@/types/dropdown';
+import React from 'react';
 import { cn } from '@/lib/utils';
-import { useAppSelector } from '@/redux/hook';
+import { DropdownType } from '@/types/dropdown';
 import { productNumOfCate } from '@/utils/categories';
 
 const Dropdown = (props: DropdownType) => {
@@ -31,7 +30,9 @@ const Dropdown = (props: DropdownType) => {
           {item.label}{' '}
           {item.url?.includes('category') && (
             <span className='text-red-500'>
-              {`(${productNumOfCate(parseInt(item.id))})`}
+              {
+                productNumOfCate(parseInt(item.id))
+              }
             </span>
           )}
         </div>

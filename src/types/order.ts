@@ -5,6 +5,7 @@ export interface OrderedDishInterface {
   quantity: number;
   price: number;
   total: number;
+  thumbnail?: string;
 }
 
 export interface OrderInterface {

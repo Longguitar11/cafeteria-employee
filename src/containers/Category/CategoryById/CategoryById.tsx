@@ -1,10 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { CardCustom } from '@/components/CardCustom';
-import { Button } from '@/components/ui/button';
-import { Quantity } from '@/components/Quantity';
 import { getValueString } from '@/utils/currency';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { createOrder, updateOrder } from '@/redux/orderSlice';
@@ -13,6 +10,7 @@ import { getDishById } from '@/utils/dish';
 import { getCategoryById } from '@/utils/categories';
 import { Props } from './CategoryById.models';
 import { DishModal } from '@/components/DishModal';
+import { DishType } from '@/types/dish';
 
 export default function CategoryById(props: Props) {
   const { className, idCate } = props;
@@ -23,10 +21,10 @@ export default function CategoryById(props: Props) {
   const [open, setOpen] = useState<boolean>(false);
   const [cardId, setCardId] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
+  const [dishes, setDishes] = useState<DishType[]>([]);
 
   // selectors
   const categories = useAppSelector((state) => state.categoryStore.categories);
-  const dishes = useAppSelector((state) => state.dishStore.dishes);
   const order = useAppSelector((state) => state.orderStore.order);
 
   // useMemo
@@ -88,7 +86,9 @@ export default function CategoryById(props: Props) {
   }, [open]);
 
   useEffect(() => {
-    getDishesByCateId(parseInt(idCate), dispatch);
+    const res = getDishesByCateId(parseInt(idCate));
+    res.then((res) => setDishes(res)).catch((error) => console.log(error));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idCate]);
 
@@ -101,12 +101,13 @@ export default function CategoryById(props: Props) {
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-10'>
         {dishes.length > 0 ? (
           dishes.map((dish) => {
-            const { id, name, price, status } = dish;
+            const { id, name, price, status, imageProduct } = dish;
             return (
               <CardCustom
                 key={id}
                 name={name}
                 price={price.toString()}
+                thumbnail={imageProduct}
                 status={status === 'true'}
                 onClick={() => onCardClick(id!)}
               />

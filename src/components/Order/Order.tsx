@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from '@/redux/hook';
+import { useAppDispatch } from '@/redux/hook';
 import {
   Dialog,
   DialogClose,
@@ -18,7 +18,7 @@ import {
   TableRow,
 } from '../ui/table';
 import { Props } from './Order.models';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getValueString } from '@/utils/currency';
 import { completeOrder, updateDish } from '@/redux/orderSlice';
 import { cn } from '@/lib/utils';
@@ -29,6 +29,9 @@ import { PaymentForm } from '@/schemas/payment';
 import { generateReport } from '@/apis/order';
 import { OrderedDishInterface } from '@/types/order';
 import { getDateTime } from '@/utils/datetime';
+import { ImageCustom } from '../ImageCustom';
+import { getAllDishes } from '@/apis/dish';
+import { DishType } from '@/types/dish';
 
 const OrderModal = (props: Props) => {
   const {
@@ -44,6 +47,7 @@ const OrderModal = (props: Props) => {
 
   const [quantity, setQuantity] = useState<number>(1);
   const [isShowPaymentModal, setIsShowPaymentModal] = useState<boolean>(false);
+  const [allDishes, setAllDishes] = useState<DishType[]>([]);
 
   const totalDish = (price: string) =>
     getValueString((parseInt(price) * quantity).toString());
@@ -99,6 +103,28 @@ const OrderModal = (props: Props) => {
     }
   };
 
+  // insert an image to dish
+  const productDetails = useMemo(() => {
+    const ids = allDishes.map(({ id }: DishType) => id);
+    const productDetailsCopy = order.productDetail;
+    return productDetailsCopy.map((dish) =>
+      ids.includes(dish.id)
+        ? {
+            ...dish,
+            thumbnail: allDishes.find((d) => d.id === dish.id)?.imageProduct,
+          }
+        : dish
+    );
+  }, [allDishes, order]);
+
+  console.log({ productDetails });
+
+  useEffect(() => {
+    const res = getAllDishes();
+    res.then((res) => setAllDishes(res)).catch((error) => console.log(error));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -109,16 +135,16 @@ const OrderModal = (props: Props) => {
             <DialogTitle className='text-3xl text-center'>ĐƠN HÀNG</DialogTitle>
           </DialogHeader>
 
-          {order.productDetail && order.productDetail.length > 0 ? (
+          {productDetails && productDetails.length > 0 ? (
             <>
-              <AddDish />
+              <AddDish allDishes={allDishes} />
 
               <Table className='w-full'>
                 <TableHeader className='w-full table table-fixed'>
                   <TableRow>
                     <TableHead className='w-12'>STT</TableHead>
                     <TableHead>Tên</TableHead>
-                    {/* <TableHead className='w-20'>Ảnh</TableHead> */}
+                    <TableHead className='w-20'>Ảnh</TableHead>
                     <TableHead className='w-24'>Số lượng</TableHead>
                     <TableHead className='w-24'>Giá</TableHead>
                     <TableHead className='w-24'>Tổng giá</TableHead>
@@ -127,7 +153,7 @@ const OrderModal = (props: Props) => {
                 </TableHeader>
 
                 <TableBody className='max-h-[362px] overflow-y-auto hidden-scrollbar block'>
-                  {order.productDetail.map((dish, index) => (
+                  {productDetails.map((dish, index) => (
                     <TableRow
                       className='w-full table table-fixed'
                       key={dish.id}
@@ -138,11 +164,9 @@ const OrderModal = (props: Props) => {
 
                       <TableCell>{dish.name}</TableCell>
 
-                      {/* <TableCell className='w-20'>
-                        <div className='relative w-14 h-14'>
-                          <Image src={dish.thumbnail} alt='thumbnail' fill />
-                        </div>
-                      </TableCell> */}
+                      <TableCell className='w-20 h-20'>
+                        <ImageCustom thumbnail={dish.thumbnail!} />
+                      </TableCell>
 
                       <TableCell className='w-24 text-center'>
                         {dish.quantity}
@@ -167,6 +191,7 @@ const OrderModal = (props: Props) => {
                           <EditDish
                             dish={dish}
                             quantity={quantity}
+                            allDishes={allDishes}
                             calTotalDish={totalDish}
                             setQuantity={setQuantity}
                             onEditDishSubmit={onEditDishSubmit}
@@ -217,7 +242,7 @@ const OrderModal = (props: Props) => {
           ) : (
             <div className='flex flex-col items-center gap-3'>
               <p className='text-xl'>Chưa có món được chọn!</p>
-              <AddDish />
+              <AddDish allDishes={allDishes} />
             </div>
           )}
         </DialogContent>

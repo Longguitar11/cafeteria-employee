@@ -19,6 +19,9 @@ import { OrderIcon } from '../OrderIcon';
 import { OrderModal } from '../Order';
 import { Options } from './Header.views';
 import { getAllCategories } from '@/apis/category';
+import { DishType } from '@/types/dish';
+import { storeCategoryIds } from '@/utils/dish';
+import { getAllDishes } from '@/apis/dish';
 
 const Header = () => {
   const router = useRouter();
@@ -31,6 +34,7 @@ const Header = () => {
   const [isHovered, setIsHovered] = useState<DropdownHoverType>({
     categories: { header: false, option: false },
   });
+  const [allDishes, setAllDishes] = useState<DishType[]>([]);
 
   const order = useAppSelector((state) => state.orderStore.order);
   const categories = useAppSelector((state) => state.categoryStore.categories);
@@ -75,11 +79,19 @@ const Header = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expriredToken]);
 
+  // store category ids
+  useEffect(() => {
+    storeCategoryIds(allDishes);
+  }, [allDishes]);
+
   useEffect(() => {
     if (!token) {
       console.log('redirect to login');
       redirect('/signin');
     }
+
+    const res = getAllDishes();
+    res.then((res) => setAllDishes(res)).catch((error) => console.log(error));
 
     getAllCategories(dispatch);
     // eslint-disable-next-line react-hooks/exhaustive-deps

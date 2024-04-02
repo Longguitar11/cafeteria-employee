@@ -4,6 +4,8 @@ import { getValueString } from '@/utils/currency';
 import { Quantity } from '../Quantity';
 import { Button } from '../ui/button';
 import { Props } from './DishModal.models';
+import { ImageCustom } from '../ImageCustom';
+import { cn } from '@/lib/utils';
 
 const DishModal = (props: Props) => {
   const {
@@ -19,10 +21,11 @@ const DishModal = (props: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className='sm:min-w-[500px] p-4'>
-        {/* <div className='flex-1 relative h-96'>
-            <Image src={selectedCard?.thumbnail || ''} alt='thumbnail' fill />
-          </div> */}
+      <DialogContent className={cn('sm:min-w-[800px] flex gap-4 p-4', className)}>
+        <ImageCustom
+          thumbnail={selectedCard?.imageProduct}
+          className='flex-1 h-auto'
+        />
 
         <div className='flex-1 flex flex-col justify-between gap-8'>
           <div className='space-y-2'>

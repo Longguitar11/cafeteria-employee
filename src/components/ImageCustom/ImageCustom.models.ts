@@ -1,4 +1,4 @@
 export interface Props {
   className?: string;
-  thumbnail: File;
+  thumbnail: string;
 }

@@ -31,15 +31,14 @@ import { PaymentForm, PaymentSchema } from '@/schemas/payment';
 import { InputCustom } from '../InputCustom';
 import { paymentMethods } from '@/constants/paymentMethod';
 import { OrderedDishInterface } from '@/types/order';
+import { ImageCustom } from '../ImageCustom';
 
 export const AddDish = (props: AddDishType) => {
-  const { className, buttonClassName } = props;
+  const { className, buttonClassName, allDishes } = props;
 
   const dispatch = useAppDispatch();
 
-  const allDishes = useAppSelector((state) => state.dishStore.allDishes);
   const order = useAppSelector((state) => state.orderStore.order);
-
   const [dishes, setDishes] = useState<DishType[]>(allDishes);
   const [dishIds, setDishIds] = useState<number[]>([]);
 
@@ -57,13 +56,8 @@ export const AddDish = (props: AddDishType) => {
   }, [order.productDetail]);
 
   const onSubmit = () => {
-    dispatch(addDishes(dishIds));
+    dispatch(addDishes({ ids: dishIds, allDishes }));
   };
-
-  useEffect(() => {
-    getAllDishes(dispatch);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <Dialog>
@@ -104,7 +98,7 @@ export const AddDish = (props: AddDishType) => {
                     !orderedDishIds.includes(dish.id!) && onDishClick(dish.id!);
                   }}
                   className={cn(
-                    'flex gap-3 justify-between items-center rounded border-[1.5px] border-gray-300 hover:border-red-400 transition-colors duration-200 p-3 cursor-pointer',
+                    'flex gap-3 items-center rounded border-[1.5px] border-gray-300 hover:border-red-400 transition-colors duration-200 p-3 cursor-pointer',
                     (dishIds.includes(dish.id!) ||
                       orderedDishIds.includes(dish.id!)) &&
                       'border-red-500',
@@ -112,19 +106,22 @@ export const AddDish = (props: AddDishType) => {
                       'bg-gray-200 border-none'
                   )}
                 >
-                  {/* <div className='relative w-12 h-12'>
-                      <Image
-                        src={dish?.thumbnail || ''}
-                        alt='thumbnail'
-                        fill
-                        className='rounded'
-                      />
-                    </div> */}
+                  <ImageCustom
+                    thumbnail={dish?.imageProduct}
+                    className='w-16 h-16'
+                  />
 
-                  <p className='font-light'>{dish.name}</p>
-                  <span className='font-light text-red-500'>
-                    {orderedDishIds.includes(dish.id!) && 'Đã chọn'}
-                  </span>
+                  <div className='flex justify-between items-center flex-1'>
+                    <div className='space-y-2'>
+                      <p className='font-normal'>{dish.name}</p>
+                      <p className='font-light text-sm'>
+                        {getValueString(dish.price.toString())}
+                      </p>
+                    </div>
+                    <span className='font-light text-red-500'>
+                      {orderedDishIds.includes(dish.id!) && 'Đã chọn'}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -168,13 +165,20 @@ export const EditDish = (props: EditDishType) => {
     setQuantity,
   } = props;
 
-  const allDishes = useAppSelector((state) => state.dishStore.allDishes);
+  const [allDishes, setAllDishes] = useState<DishType[]>([]);
 
   const selectedDish = useMemo(() => {
     const selectedDish = allDishes.find((d) => d.id === dish.id);
 
     if (selectedDish) return selectedDish;
   }, [dish, allDishes]);
+
+  // get all dishes
+  useEffect(() => {
+    const res = getAllDishes();
+    res.then((res) => setAllDishes(res)).catch((error) => console.log(error));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Dialog>
@@ -187,59 +191,57 @@ export const EditDish = (props: EditDishType) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className={cn('sm:min-w-[500px] p-4', className)}>
-        <div className='flex gap-4'>
-          {/* <div className='flex-1 relative h-96'>
-              <Image src={dish?.thumbnail || ''} alt='thumbnail' fill />
-            </div> */}
+      <DialogContent
+        className={cn('sm:min-w-[800px] flex gap-4 p-4', className)}
+      >
+        <ImageCustom thumbnail={dish?.thumbnail!} className='flex-1 h-auto' />
 
-          <div className='flex-1 flex flex-col justify-between gap-8'>
-            <div className='space-y-3'>
-              <p className='text-3xl font-semibold'>{dish?.name}</p>
+        <div className='flex-1 flex flex-col justify-between gap-8'>
+          <div className='space-y-3'>
+            <p className='text-3xl font-semibold'>{dish?.name}</p>
 
-              <div className='flex gap-4 items-center'>
-                <p className='text-xl text-amber-500'>
-                  {getValueString((dish?.price || 0).toString())}
-                </p>
-
-                <span className=' border-2 border-green-500 px-2 text-green-600 rounded'>
-                  {selectedDish?.categoryName}
-                </span>
-              </div>
-
-              <p className='text-base text-gray-400'>
-                Mô tả: {selectedDish?.description}
+            <div className='flex gap-4 items-center'>
+              <p className='text-xl text-amber-500'>
+                {getValueString((dish?.price || 0).toString())}
               </p>
 
-              <Quantity quantity={quantity} setQuantity={setQuantity} />
+              <span className=' border-2 border-green-500 px-2 text-green-600 rounded'>
+                {selectedDish?.categoryName}
+              </span>
             </div>
 
-            <DialogFooter className='space-y-3 block'>
-              <p className='text-xl text-end'>
-                Thành tiền:{' '}
-                <span className='font-medium text-red-500'>
-                  {calTotalDish(dish.price.toString())}
-                </span>
-              </p>
-              <div className='w-full flex gap-3'>
-                <DialogClose asChild>
-                  <Button variant='secondary' className='flex-1'>
-                    Hủy bỏ
-                  </Button>
-                </DialogClose>
-                <DialogClose asChild>
-                  <Button
-                    type='submit'
-                    variant='success'
-                    className='flex-1'
-                    onClick={() => onEditDishSubmit(dish.id!)}
-                  >
-                    Xác nhận
-                  </Button>
-                </DialogClose>
-              </div>
-            </DialogFooter>
+            <p className='text-base text-gray-400'>
+              Mô tả: {selectedDish?.description}
+            </p>
+
+            <Quantity quantity={quantity} setQuantity={setQuantity} />
           </div>
+
+          <DialogFooter className='space-y-3 block'>
+            <p className='text-xl text-end'>
+              Thành tiền:{' '}
+              <span className='font-medium text-red-500'>
+                {calTotalDish(dish.price.toString())}
+              </span>
+            </p>
+            <div className='w-full flex gap-3'>
+              <DialogClose asChild>
+                <Button variant='secondary' className='flex-1'>
+                  Hủy bỏ
+                </Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button
+                  type='submit'
+                  variant='success'
+                  className='flex-1'
+                  onClick={() => onEditDishSubmit(dish.id!)}
+                >
+                  Xác nhận
+                </Button>
+              </DialogClose>
+            </div>
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>
@@ -309,7 +311,8 @@ export const PaymentButton = (props: PaymentButtonType) => {
                         onClick={() => onChange(item.value)}
                         className={cn(
                           'flex-1 p-3 text-center rounded shadow border-[0.5px] hover:border-green-500 transition-colors duration-200 cursor-pointer',
-                          value === item.value && 'border-green-500', item.value === 'ALL' && 'hidden'
+                          value === item.value && 'border-green-500',
+                          item.value === 'ALL' && 'hidden'
                         )}
                       >
                         {item.label}

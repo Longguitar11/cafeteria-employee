@@ -7,4 +7,6 @@ export interface DishType {
   description: string
   price: number
   status?: string
+  imageProduct: string;
+  fileName?: string;
 }
