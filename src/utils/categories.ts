@@ -1,5 +1,4 @@
 import { CategoryType } from '@/types/category';
-import { DishType } from '@/types/dish';
 
 export const categoriesDropdownData = (categories: CategoryType[]) => {
   const data = categories.map((cate) => ({
@@ -16,17 +15,4 @@ export const getCategoryById = (categories: CategoryType[], id: number) => {
 
   if (currentCategory) return currentCategory;
   return null;
-};
-
-export const productNumOfCate = (id: number) => {
-  if (typeof window !== undefined) {
-    const categoryIds: number[] = JSON.parse(
-      localStorage.getItem('categoryIds') || '[]'
-    );
-    const numOfProPerCate = categoryIds.filter(
-      (cateId) => cateId === id
-    ).length;
-
-    return numOfProPerCate > 0 ? `(${numOfProPerCate})` : '';
-  }
 };

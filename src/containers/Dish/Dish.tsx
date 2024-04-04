@@ -21,6 +21,7 @@ const Dish = (props: Props) => {
   const [cardId, setCardId] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [allDishes, setAllDishes] = useState<DishType[]>([]);
+  const [isGettingDishes, setIsGettingDishes] = useState<boolean>(false);
 
   console.log({ allDishes });
 
@@ -34,9 +35,26 @@ const Dish = (props: Props) => {
   );
 
   const categoryIds: number[] = useMemo(() => {
-    if (window !== undefined) {
-      return JSON.parse(localStorage.getItem('categoryIds') || '');
+    const dishList = allDishes.filter((dish) => dish.status === 'true');
+    const categoryIds: number[] = [];
+    for (const dish of dishList) {
+      if (!categoryIds.includes(dish.categoryId))
+        categoryIds.push(dish.categoryId);
     }
+    return categoryIds;
+  }, [allDishes]);
+
+  // useCallback
+  const fetchDishes = useCallback(() => {
+    const res = getAllDishes();
+
+    setIsGettingDishes(true);
+    res
+      .then((res) => {
+        setIsGettingDishes(false);
+        setAllDishes(res);
+      })
+      .catch((error) => console.log(error));
   }, []);
 
   // variables
@@ -87,8 +105,7 @@ const Dish = (props: Props) => {
   }, [open]);
 
   useEffect(() => {
-    const res = getAllDishes();
-    res.then((res) => setAllDishes(res)).catch((error) => console.log(error));
+    fetchDishes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -99,45 +116,46 @@ const Dish = (props: Props) => {
       </p>
 
       <div className=' mt-10'>
-        {allDishes.length > 0 ? (
-          <div className='space-y-6'>
-            {categoryIds.map((cateId) => {
-              const categoryName = categories.find(
-                (cate) => cateId === cate.id
-              )?.name;
-              return (
-                <div key={cateId} className='flex flex-col gap-4'>
-                  <p className='text-gray-500 text-2xl font-medium uppercase tracking-widest'>{categoryName}</p>
+        {!isGettingDishes ? (
+          allDishes.length > 0 ? (
+            <div className='space-y-6'>
+              {categoryIds.map((cateId) => {
+                const categoryName = categories.find(
+                  (cate) => cateId === cate.id
+                )?.name;
+                return (
+                  <div key={cateId} className='flex flex-col gap-4'>
+                    <p className='text-gray-500 text-2xl font-medium uppercase tracking-widest'>
+                      {categoryName}
+                    </p>
 
-                  <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4'>
-                    {allDishes
-                      .filter((dish) => dish.categoryId === cateId)
-                      .map((dish) => {
-                        const {
-                          id,
-                          name,
-                          price,
-                          status,
-                          imageProduct,
-                        } = dish;
-                        return (
-                          <CardCustom
-                            key={id}
-                            name={name}
-                            thumbnail={imageProduct}
-                            price={price.toString()}
-                            status={status === 'true'}
-                            onClick={() => onCardClick(id!)}
-                          />
-                        );
-                      })}
+                    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4'>
+                      {allDishes
+                        .filter((dish) => dish.categoryId === cateId)
+                        .map((dish) => {
+                          const { id, name, price, status, imageProduct } =
+                            dish;
+                          return (
+                            <CardCustom
+                              key={id}
+                              name={name}
+                              thumbnail={imageProduct}
+                              price={price.toString()}
+                              status={status === 'true'}
+                              onClick={() => onCardClick(id!)}
+                            />
+                          );
+                        })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div>Không có món nào!</div>
+          )
         ) : (
-          <div>Không có món nào!</div>
+          <div className='text-sky-500 text-lg text-center'>Đang tải...</div>
         )}
       </div>
 

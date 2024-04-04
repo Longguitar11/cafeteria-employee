@@ -22,6 +22,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import isEqual from 'lodash/isEqual';
 
 const TransactionFilter = (props: Props) => {
   const { className = '', allBills, bills, setBills } = props;
@@ -52,9 +53,11 @@ const TransactionFilter = (props: Props) => {
         toTime: date?.to || undefined,
       });
 
-      console.log({ result, bills });
+      console.log({ result });
 
-      setBills(result);
+      if (!isEqual(result, bills)) {
+        setBills(result);
+      }
     }, 800);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,7 +72,7 @@ const TransactionFilter = (props: Props) => {
       <Input
         type='text'
         placeholder='Tìm hóa đơn (theo id, email NV, tên KH, sđt KH, email KH)'
-        className='text-base w-full sm:w-auto'
+        className='text-base w-full sm:w-[300px] md:w-[500px]'
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
       />
@@ -80,7 +83,7 @@ const TransactionFilter = (props: Props) => {
             id='date'
             variant={'outline'}
             className={cn(
-              'w-full sm:w-[300px] justify-start text-left font-normal',
+              'flex-1 justify-start text-left font-normal',
               !date && 'text-muted-foreground'
             )}
           >
@@ -115,7 +118,7 @@ const TransactionFilter = (props: Props) => {
         value={paymentMethod}
         onValueChange={(value: PaymentMethod) => setPaymentMethod(value)}
       >
-        <SelectTrigger className='flex-1 sm:w-[300px]'>
+        <SelectTrigger className='flex-1'>
           <SelectValue placeholder='Phương thức thanh toán' />
         </SelectTrigger>
         <SelectContent>

@@ -9,16 +9,15 @@ import {
 } from '../ui/card';
 import { getValueString } from '@/utils/currency';
 import { cn } from '@/lib/utils';
-import { productNumOfCate } from '@/utils/categories';
 import { ImageCustom } from '../ImageCustom';
 
 const CardCustom = (props: Props) => {
   const {
     className = '',
-    id,
     name,
     price,
     thumbnail,
+    numOfDishesPerCate,
     status = true,
     onClick,
   } = props;
@@ -26,7 +25,7 @@ const CardCustom = (props: Props) => {
   return (
     <Card
       className={cn(
-        'border-[0.5px] p-3 relative flex flex-col hover:border-gray-800 transition-colors duration-200',
+        'border-[0.5px] p-3 relative flex flex-col hover:border-gray-600 transition-colors duration-200',
         !status && 'hidden',
         className
       )}
@@ -41,10 +40,10 @@ const CardCustom = (props: Props) => {
       )}
       <CardContent className='flex-1 flex flex-col justify-between'>
         <CardTitle>
-          {name}{' '}
-          <span className='text-green-500'>
-            {productNumOfCate(id!)}
-          </span>
+          <span className='text-gray-500'>{name}{' '}</span>
+          {numOfDishesPerCate! >= 0 && (
+            <span className='text-green-500'>{`(${numOfDishesPerCate})`}</span>
+          )}
         </CardTitle>
         {price && <CardDescription>{getValueString(price)}</CardDescription>}
       </CardContent>

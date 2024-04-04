@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CardCustom } from '@/components/CardCustom';
 import { getValueString } from '@/utils/currency';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
@@ -22,6 +22,7 @@ export default function CategoryById(props: Props) {
   const [cardId, setCardId] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [dishes, setDishes] = useState<DishType[]>([]);
+  const [isGettingDishes, setIsGettingDishes] = useState<boolean>(false);
 
   // selectors
   const categories = useAppSelector((state) => state.categoryStore.categories);
@@ -37,6 +38,19 @@ export default function CategoryById(props: Props) {
     () => getDishById(dishes, cardId),
     [cardId, dishes]
   );
+
+  // useCallback
+  const fetchDishes = useCallback(() => {
+    const res = getDishesByCateId(parseInt(idCate));
+
+    setIsGettingDishes(true);
+    res
+      .then((res) => {
+        setIsGettingDishes(false);
+        setDishes(res);
+      })
+      .catch((error) => console.log(error));
+  }, [idCate]);
 
   // variables
   const total = selectedCard?.price! * quantity;
@@ -86,8 +100,7 @@ export default function CategoryById(props: Props) {
   }, [open]);
 
   useEffect(() => {
-    const res = getDishesByCateId(parseInt(idCate));
-    res.then((res) => setDishes(res)).catch((error) => console.log(error));
+    fetchDishes();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idCate]);
@@ -98,25 +111,31 @@ export default function CategoryById(props: Props) {
         {category?.name}
       </p>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-10'>
-        {dishes.length > 0 ? (
-          dishes.map((dish) => {
-            const { id, name, price, status, imageProduct } = dish;
-            return (
-              <CardCustom
-                key={id}
-                name={name}
-                price={price.toString()}
-                thumbnail={imageProduct}
-                status={status === 'true'}
-                onClick={() => onCardClick(id!)}
-              />
-            );
-          })
+      {!isGettingDishes ? (
+        dishes.length > 0 ? (
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-10'>
+            {dishes.map((dish) => {
+              const { id, name, price, status, imageProduct } = dish;
+              return (
+                <CardCustom
+                  key={id}
+                  name={name}
+                  price={price.toString()}
+                  thumbnail={imageProduct}
+                  status={status === 'true'}
+                  onClick={() => onCardClick(id!)}
+                />
+              );
+            })}
+          </div>
         ) : (
-          <div>Không có món nào!</div>
-        )}
-      </div>
+          <div className='text-center text-xl mt-4'>Không có món nào!</div>
+        )
+      ) : (
+        <div className='text-sky-500 text-center text-xl mt-4'>
+          Đang tải...
+        </div>
+      )}
 
       <DishModal
         amount={amount}

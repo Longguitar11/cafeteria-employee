@@ -1,7 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { DropdownType } from '@/types/dropdown';
-import { productNumOfCate } from '@/utils/categories';
 
 const Dropdown = (props: DropdownType) => {
   const { className = '', data, onClick, onMouseLeave, onMouseOver } = props;
@@ -27,14 +26,7 @@ const Dropdown = (props: DropdownType) => {
             index === 0 && 'rounded-tl rounded-tr'
           )}
         >
-          {item.label}{' '}
-          {item.url?.includes('category') && (
-            <span className='text-red-500'>
-              {
-                productNumOfCate(parseInt(item.id))
-              }
-            </span>
-          )}
+          {item.label}
         </div>
       ))}
     </div>

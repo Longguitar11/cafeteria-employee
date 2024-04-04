@@ -15,7 +15,6 @@ export interface GenerateReportInterface {
 
 export const generateReport = async (
   data: GenerateReportInterface,
-  dispatch: any
 ) => {
   const {
     name,
@@ -43,7 +42,6 @@ export const generateReport = async (
     console.log({ status, data });
 
     if (status >= 200 && status < 400) {
-      getBills(dispatch);
       toast.success('Xuất hóa đơn thành công!');
     }
   } catch (error) {
@@ -55,14 +53,14 @@ export const generateReport = async (
   }
 };
 
-export const getBills = async (dispatch: any) => {
+export const getBills = async () => {
   try {
     const { status, data } = await Axios.get(`/bill/getBills`);
 
     console.log({ status, data });
 
     if (status >= 200 && status < 400) {
-      dispatch(getAllOrders(data));
+      return data;
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

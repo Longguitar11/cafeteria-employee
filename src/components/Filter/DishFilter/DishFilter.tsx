@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Input } from '../../ui/input';
+import isEqual from 'lodash/isEqual';
 import { cn } from '@/lib/utils';
 import { Props } from './DishFilter.models';
 import { filterOptions } from './DishFilter.utils';
@@ -22,7 +23,7 @@ const DishFilter = (props: Props) => {
         cateId: cateId!,
       });
 
-      if (result.toString() !== dishes.toString()) {
+      if (!isEqual(result, dishes)) {
         setDishes(result);
       }
     }, 800);

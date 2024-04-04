@@ -1,13 +1,5 @@
 import { useAppDispatch } from '@/redux/hook';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import {
   Table,
   TableBody,
@@ -84,18 +76,15 @@ const OrderModal = (props: Props) => {
         })
       );
 
-      generateReport(
-        {
-          contactNumber,
-          email,
-          name,
-          paymentMethod,
-          productDetail: JSON.stringify(productDetail),
-          totalAmount: order.totalAmount.toString(),
-          createdAt: getDateTime(new Date()),
-        },
-        dispatch
-      );
+      generateReport({
+        contactNumber,
+        email,
+        name,
+        paymentMethod,
+        productDetail: JSON.stringify(productDetail),
+        totalAmount: order.totalAmount.toString(),
+        createdAt: getDateTime(new Date()),
+      });
 
       dispatch(completeOrder());
       setIsOpen(false);

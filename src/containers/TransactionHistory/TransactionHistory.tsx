@@ -24,18 +24,17 @@ import { BillInterface, OrderedDishInterface } from '@/types/order';
 import { getBills } from '@/apis/order';
 import { TransactionFilter } from '@/components/Filter';
 import { paymentMethods } from '@/constants/paymentMethod';
+import { Badge } from '@/components/ui/badge';
 
 const TransactionHistory = (props: Props) => {
   const { className } = props;
 
-  const dispatch = useAppDispatch();
-
-  const allOrders = useAppSelector((state) => state.orderStore.allOrders);
-
+  const [allOrders, setAllOrders] = useState<BillInterface[]>([]);
   const [bills, setBills] = useState<BillInterface[]>(allOrders);
   const [isShowViewOrder, setIsShowViewOrder] = useState<boolean>(false);
   const [orderId, setOrderId] = useState<number>(0);
   const [isShowSum, setIsShowSum] = useState<boolean>(false);
+  const [isGettingOrders, setIsGettingOrders] = useState<boolean>(false);
 
   const selectedOrder = useMemo(() => {
     const selectedOrder = bills.find((order) => order.id === orderId);
@@ -43,7 +42,6 @@ const TransactionHistory = (props: Props) => {
   }, [orderId, bills]);
 
   const sumOfTotal = useMemo(() => {
-    console.log('calc')
     let sum = 0;
     for (const bill of bills) {
       sum += bill.total;
@@ -57,7 +55,16 @@ const TransactionHistory = (props: Props) => {
   }, [allOrders]);
 
   useEffect(() => {
-    getBills(dispatch);
+    const res = getBills();
+
+    setIsGettingOrders(true);
+
+    res
+      .then((res) => {
+        setIsGettingOrders(false);
+        setAllOrders(res);
+      })
+      .catch((error) => console.log({ error }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -67,114 +74,119 @@ const TransactionHistory = (props: Props) => {
         LỊCH SỬ GIAO DỊCH
       </p>
 
-      {allOrders.length > 0 ? (
-        <>
-          <TransactionFilter
-            className='mt-10 mb-4'
-            bills={bills}
-            setBills={setBills}
-            allBills={allOrders}
-          />
+      {!isGettingOrders ? (
+        allOrders.length > 0 ? (
+          <>
+            <TransactionFilter
+              className='mt-10 mb-4'
+              bills={bills}
+              setBills={setBills}
+              allBills={allOrders}
+            />
 
-          {bills.length > 0 && (
-            <div className='flex justify-end items-center gap-3 mb-4'>
-              {isShowSum && (
-                <p className='text-xl font-medium text-sky-500 transition-transform -translate-x-5 duration-200'>{sumOfTotal}</p>
-              )}
-              <Button
-                variant='warning'
-                onClick={() => setIsShowSum((pre) => !pre)}
-              >
-                Xem tổng tiền
-              </Button>
-            </div>
-          )}
+            {bills.length > 0 && (
+              <div className='flex justify-end items-center gap-3 mb-4'>
+                {isShowSum && (
+                  <p className='text-xl font-medium text-sky-500 transition-transform -translate-x-5 duration-200'>
+                    {sumOfTotal}
+                  </p>
+                )}
+                <Button
+                  variant='warning'
+                  onClick={() => setIsShowSum((pre) => !pre)}
+                >
+                  Xem tổng tiền
+                </Button>
+              </div>
+            )}
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Id</TableHead>
-                <TableHead>Email nhân viên</TableHead>
-                <TableHead>Tên khách hàng</TableHead>
-                {/* <TableHead className='w-20'>Ảnh</TableHead> */}
-                <TableHead>SĐT khách hàng</TableHead>
-                <TableHead>Email khách hàng</TableHead>
-                <TableHead>Chi tiết đơn hàng</TableHead>
-                <TableHead>Hình thức thanh toán</TableHead>
-                <TableHead>Thời gian</TableHead>
-                <TableHead>Thành tiền</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {bills.length > 0 ? (
-                bills.map((bill) => {
-                  const {
-                    id,
-                    uuid,
-                    contactNumber,
-                    createdBy,
-                    email,
-                    name,
-                    paymentMethod,
-                    total,
-                    createdAt,
-                  } = bill;
-
-                  const currentPaymentMethod = paymentMethods.find(
-                    (pm) => pm.value === paymentMethod
-                  )?.label;
-
-                  return (
-                    <TableRow key={uuid}>
-                      <TableCell className='font-medium'>{id}</TableCell>
-                      <TableCell>{createdBy}</TableCell>
-                      <TableCell>{name}</TableCell>
-
-                      {/* <TableCell className='w-20'>
-                        <div className='relative w-14 h-14'>
-                          <Image src={dish.thumbnail} alt='thumbnail' fill />
-                        </div>
-                      </TableCell> */}
-
-                      <TableCell className=''>{contactNumber}</TableCell>
-
-                      <TableCell className=''>{email}</TableCell>
-
-                      <TableCell className=''>
-                        <Button
-                          variant='primary'
-                          onClick={() => {
-                            setIsShowViewOrder(true);
-                            setOrderId(id);
-                          }}
-                        >
-                          Xem chi tiết
-                        </Button>
-                      </TableCell>
-
-                      <TableCell className=''>{currentPaymentMethod}</TableCell>
-                      <TableCell className=''>{createdAt}</TableCell>
-
-                      <TableCell>{getValueString(total.toString())}</TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell
-                    colSpan={9}
-                    className='text-red-500 text-xl text-center'
-                  >
-                    Không tìm ra hóa đơn!
-                  </TableCell>
+                  <TableHead>Id</TableHead>
+                  <TableHead>Email nhân viên</TableHead>
+                  <TableHead>Tên khách hàng</TableHead>
+                  <TableHead>SĐT khách hàng</TableHead>
+                  <TableHead>Email khách hàng</TableHead>
+                  <TableHead>Chi tiết đơn hàng</TableHead>
+                  <TableHead>Hình thức thanh toán</TableHead>
+                  <TableHead>Thời gian</TableHead>
+                  <TableHead>Thành tiền</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </>
+              </TableHeader>
+
+              <TableBody>
+                {bills.length > 0 ? (
+                  bills.map((bill) => {
+                    const {
+                      id,
+                      uuid,
+                      contactNumber,
+                      createdBy,
+                      email,
+                      name,
+                      paymentMethod,
+                      total,
+                      createdAt,
+                    } = bill;
+
+                    const currentPaymentMethod = paymentMethods.find(
+                      (pm) => pm.value === paymentMethod
+                    )?.label;
+
+                    return (
+                      <TableRow key={uuid}>
+                        <TableCell className='font-medium'>{id}</TableCell>
+                        <TableCell>{createdBy}</TableCell>
+                        <TableCell>{name}</TableCell>
+
+                        <TableCell>{contactNumber}</TableCell>
+
+                        <TableCell>{email}</TableCell>
+
+                        <TableCell>
+                          <Button
+                            variant='primary'
+                            onClick={() => {
+                              setIsShowViewOrder(true);
+                              setOrderId(id);
+                            }}
+                          >
+                            Xem chi tiết
+                          </Button>
+                        </TableCell>
+
+                        <TableCell>
+                          <Badge className='w-full'>
+                            {currentPaymentMethod}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{createdAt}</TableCell>
+
+                        <TableCell className='font-medium'>
+                          {getValueString(total.toString())}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={9}
+                      className='text-red-500 text-xl text-center'
+                    >
+                      Không tìm ra hóa đơn!
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </>
+        ) : (
+          <p className='mt-10 text-xl text-center'>Lịch sử giao dịch trống!</p>
+        )
       ) : (
-        <p className='mt-10'>Lịch sử giao dịch trống!</p>
+        <p className='mt-10 text-sky-500 text-xl text-center'>Đang tải...</p>
       )}
 
       <Dialog open={isShowViewOrder} onOpenChange={setIsShowViewOrder}>
