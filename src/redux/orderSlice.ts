@@ -162,10 +162,6 @@ const OrderSlice = createSlice({
 
       toast.success(`Hủy đơn hàng thành công!`);
     },
-    getAllOrders: (state, action: PayloadAction<BillInterface[]>) => {
-      state.allOrders = action.payload;
-      localStorage.setItem('allOrders', JSON.stringify(state.allOrders));
-    },
     completeOrder: (state) => {
       state.order = defaultOrder;
 
@@ -181,7 +177,6 @@ export const {
   updateDish,
   addDishes,
   deleteDish,
-  getAllOrders,
   completeOrder,
   cancelOrder,
 } = OrderSlice.actions;

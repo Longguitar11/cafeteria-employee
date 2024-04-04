@@ -1,7 +1,6 @@
 import { toast } from 'react-toastify';
 import Axios from './axiosConfig';
 import axios from 'axios';
-import { getAllOrders } from '@/redux/orderSlice';
 
 export interface GenerateReportInterface {
   name: string;
