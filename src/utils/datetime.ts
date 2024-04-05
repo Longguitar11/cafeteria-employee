@@ -75,8 +75,19 @@ export const filterTime = (
     } else if (fromTime && toTime) {
       if (fromTime.year <= orderTime.year && toTime.year >= orderTime.year) {
         if (
-          fromTime.month <= orderTime.month &&
-          toTime.month >= orderTime.month
+          fromTime.month === orderTime.month &&
+          toTime.month === orderTime.month
+        ) {
+          if (
+            fromTime.date <= orderTime.date &&
+            toTime.date >= orderTime.date
+          ) {
+            return true;
+          } else return false;
+        } else if (
+          (fromTime.month < orderTime.month &&
+            toTime.month >= orderTime.month) ||
+          (fromTime.month <= orderTime.month && toTime.month > orderTime.month)
         ) {
           if (
             fromTime.date <= orderTime.date ||
